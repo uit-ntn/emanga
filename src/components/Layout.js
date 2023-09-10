@@ -1,13 +1,14 @@
 import React from "react";
 import Header from "./Header";
 import Footer from "./Footer";
-import "../style/Layout.css";
 
 function Layout({ children }) {
   return (
-    <div className="Layout">
+    <div className="Layout d-flex flex-column min-vh-100">
       <Header />
-      <span className="child">{children}</span>
+      <main className="flex-grow-1 bg-light">
+        {children}
+      </main>
       <Footer />
     </div>
   );
