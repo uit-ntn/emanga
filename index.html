@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="description" content="eManga – đọc manga miễn phí, nhanh và đẹp. Dữ liệu từ MangaDex." />
+    <meta name="theme-color" content="#e11d48" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <title>eManga – Đọc manga online</title>
+    <script>
+      // Apply theme before paint to avoid flashing
+      try {
+        var t = JSON.parse(localStorage.getItem('emanga:settings') || '{}').theme || 'system';
+        var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', dark);
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <noscript>Bạn cần bật JavaScript để sử dụng eManga.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
