@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import clsx from 'clsx';
 import ThemeToggle from './ThemeToggle';
+import SearchBox from './SearchBox';
 
 const NAV = [
   { to: '/', label: 'Trang chủ', end: true },
@@ -21,7 +22,7 @@ export function Logo() {
   );
 }
 
-export default function Header({ children }) {
+export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -61,7 +62,7 @@ export default function Header({ children }) {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-1">
-          {children}
+          <SearchBox className="hidden w-56 sm:block lg:w-80" />
           <ThemeToggle />
           <button
             type="button"
@@ -76,6 +77,7 @@ export default function Header({ children }) {
       </div>
       {open && (
         <nav className="container-page animate-fade-in pb-4 md:hidden" aria-label="Di động">
+          <SearchBox className="mb-3 sm:hidden" />
           <div className="flex flex-col">
             {NAV.map((n) => (
               <NavLink key={n.to} to={n.to} end={n.end} className={linkCls}>
