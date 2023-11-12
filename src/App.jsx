@@ -5,6 +5,7 @@ import PageLoader from './components/ui/PageLoader';
 import { useThemeSync } from './hooks/useTheme';
 
 const Home = lazy(() => import('./pages/Home'));
+const Browse = lazy(() => import('./pages/Browse'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<Home />} />
+            <Route path="browse" element={<Browse />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
