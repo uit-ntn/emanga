@@ -2,19 +2,16 @@ import { useState } from 'react';
 import { ImageOff } from 'lucide-react';
 import clsx from 'clsx';
 
-/** Manga cover with 2:3 ratio, lazy loading, shimmer and fallback. */
-export default function Cover({ src, alt, className, eager = false, rounded = 'rounded-xl' }) {
+/** Manga cover with 2:3 ratio, lazy loading, dominant-color placeholder and fallback. */
+export default function Cover({ src, alt, color, className, eager = false, rounded = 'rounded-xl' }) {
   const [state, setState] = useState(src ? 'loading' : 'error');
 
   return (
     <div
-      className={clsx(
-        'relative aspect-[2/3] w-full overflow-hidden bg-zinc-200 dark:bg-zinc-800',
-        rounded,
-        className
-      )}
+      className={clsx('relative aspect-[2/3] w-full overflow-hidden bg-zinc-200 dark:bg-zinc-800', rounded, className)}
+      style={color && state !== 'loaded' ? { backgroundColor: color } : undefined}
     >
-      {state === 'loading' && <div className="absolute inset-0 animate-pulse bg-zinc-300/60 dark:bg-zinc-700/60" />}
+      {state === 'loading' && <div className="absolute inset-0 animate-pulse bg-white/10" />}
       {state === 'error' ? (
         <div className="absolute inset-0 grid place-items-center text-zinc-400">
           <ImageOff className="h-8 w-8" />
@@ -25,7 +22,6 @@ export default function Cover({ src, alt, className, eager = false, rounded = 'r
           alt={alt}
           loading={eager ? 'eager' : 'lazy'}
           decoding="async"
-          referrerPolicy="no-referrer"
           onLoad={() => setState('loaded')}
           onError={() => setState('error')}
           className={clsx(

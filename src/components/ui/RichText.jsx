@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 
 /**
- * Minimal, safe Markdown renderer for MangaDex descriptions.
+ * Minimal, safe Markdown renderer for manga descriptions.
  * Supports paragraphs, line breaks, **bold**, *italic*, [links](url) and bare URLs.
  * Produces React nodes – never injects raw HTML.
  */
@@ -38,7 +38,7 @@ function inline(text, keyPrefix) {
 }
 
 function cleanDescription(text = '') {
-  // MangaDex descriptions often end with a "---" separator followed by link lists
+  // Some descriptions end with a "---" separator followed by link lists
   return text.split(/\n\s*-{3,}\s*\n/)[0].replace(/&quot;/g, '"').replace(/&amp;/g, '&').trim();
 }
 

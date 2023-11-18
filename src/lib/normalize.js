@@ -1,94 +1,102 @@
-import { UPLOADS_BASE } from '../api/client';
-
-/** Pick the best string from a MangaDex localized object, e.g. { en: '...', ja: '...' } */
-export function pickLocalized(obj, preferred = ['vi', 'en']) {
-  if (!obj) return '';
-  for (const lang of preferred) if (obj[lang]) return obj[lang];
-  const first = Object.values(obj)[0];
-  return first || '';
+/** Prefer the English title, then romaji, then native. */
+export function pickTitle(title = {}) {
+  return title.english || title.romaji || title.userPreferred || title.native || 'Không có tiêu đề';
 }
 
-/** Title: prefer vi/en title, then vi/en alt titles, then whatever exists. */
-export function pickTitle(attributes, preferred = ['vi', 'en']) {
-  const { title = {}, altTitles = [] } = attributes;
-  for (const lang of preferred) {
-    if (title[lang]) return title[lang];
-    const alt = altTitles.find((t) => t[lang]);
-    if (alt) return alt[lang];
-  }
-  return pickLocalized(title, ['ja-ro', 'en']) || 'Không có tiêu đề';
+/**
+ * AniList descriptions (asHtml: false) still contain some HTML tags (<br>, <i>, <b>)
+ * and AniList markdown (~!spoiler!~, __bold__). Convert to plain markdown-ish text.
+ */
+export function cleanDescription(text = '') {
+  if (!text) return '';
+  return text
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/?(i|em)>/gi, '_')
+    .replace(/<\/?(b|strong)>/gi, '**')
+    .replace(/<a [^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)')
+    .replace(/<[^>]+>/g, '')
+    .replace(/~!([\s\S]*?)!~/g, '')
+    .replace(/__([^_]+)__/g, '**$1**')
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&#039;/g, "'")
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
-export function coverUrl(mangaId, fileName, size = 512) {
-  if (!mangaId || !fileName) return null;
-  const suffix = size ? `.${size}.jpg` : '';
-  return `${UPLOADS_BASE}/covers/${mangaId}/${fileName}${suffix}`;
+export function plainText(text = '') {
+  return cleanDescription(text)
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[*_]/g, '');
 }
 
-const rel = (item, type) => (item.relationships || []).filter((r) => r.type === type);
-
-export function normalizeManga(item) {
-  if (!item) return null;
-  const a = item.attributes;
-  const cover = rel(item, 'cover_art')[0];
-  const fileName = cover?.attributes?.fileName;
-  const names = (type) =>
-    rel(item, type)
-      .map((r) => r.attributes?.name)
-      .filter(Boolean);
-
+export function normalizeManga(m) {
+  if (!m) return null;
   return {
-    id: item.id,
-    title: pickTitle(a),
-    altTitles: (a.altTitles || []).map((t) => Object.values(t)[0]).filter(Boolean),
-    description: pickLocalized(a.description),
-    status: a.status,
-    year: a.year,
-    demographic: a.publicationDemographic,
-    contentRating: a.contentRating,
-    originalLanguage: a.originalLanguage,
-    lastChapter: a.lastChapter,
-    lastVolume: a.lastVolume,
-    availableLanguages: a.availableTranslatedLanguages || [],
-    latestChapterId: a.latestUploadedChapter,
-    updatedAt: a.updatedAt,
-    createdAt: a.createdAt,
-    tags: (a.tags || []).map((t) => ({
+    id: m.id,
+    title: pickTitle(m.title),
+    romaji: m.title?.romaji,
+    native: m.title?.native,
+    cover: m.coverImage?.extraLarge || m.coverImage?.large,
+    coverSmall: m.coverImage?.large || m.coverImage?.medium,
+    color: m.coverImage?.color,
+    banner: m.bannerImage,
+    format: m.format,
+    status: m.status,
+    chapters: m.chapters,
+    volumes: m.volumes,
+    score: m.averageScore,
+    popularity: m.popularity,
+    genres: m.genres ?? [],
+    country: m.countryOfOrigin,
+    year: m.startDate?.year,
+    description: cleanDescription(m.description),
+  };
+}
+
+const formatDate = (d) => (d?.year ? [d.day, d.month, d.year].filter(Boolean).join('/') : null);
+
+export function normalizeMangaDetail(m) {
+  const base = normalizeManga(m);
+  return {
+    ...base,
+    synonyms: m.synonyms ?? [],
+    meanScore: m.meanScore,
+    favourites: m.favourites,
+    source: m.source,
+    startDate: formatDate(m.startDate),
+    endDate: formatDate(m.endDate),
+    siteUrl: m.siteUrl,
+    tags: (m.tags ?? []).map((t) => ({
       id: t.id,
-      name: pickLocalized(t.attributes.name, ['en']),
-      group: t.attributes.group,
+      name: t.name,
+      description: t.description,
+      rank: t.rank,
+      spoiler: t.isMediaSpoiler,
+      category: t.category,
     })),
-    authors: names('author'),
-    artists: names('artist'),
-    coverFile: fileName || null,
-    cover: coverUrl(item.id, fileName, 512),
-    coverSmall: coverUrl(item.id, fileName, 256),
-    links: a.links || {},
+    links: m.externalLinks ?? [],
+    rankings: (m.rankings ?? []).filter((r) => r.allTime),
+    scoreDistribution: m.stats?.scoreDistribution ?? [],
+    statusDistribution: m.stats?.statusDistribution ?? [],
+    staff: (m.staff?.edges ?? []).map((e) => ({
+      id: e.node.id,
+      name: e.node.name.full,
+      image: e.node.image?.medium,
+      role: e.role,
+    })),
+    characters: (m.characters?.edges ?? []).map((e) => ({
+      id: e.node.id,
+      name: e.node.name.full,
+      image: e.node.image?.medium,
+      role: e.role,
+    })),
+    relations: (m.relations?.edges ?? [])
+      .filter((e) => e.node.type === 'MANGA')
+      .map((e) => ({ type: e.relationType, manga: normalizeManga(e.node) })),
+    recommendations: (m.recommendations?.nodes ?? [])
+      .map((n) => n.mediaRecommendation)
+      .filter((r) => r && r.type === 'MANGA' && !r.isAdult)
+      .map(normalizeManga),
   };
-}
-
-export function normalizeChapter(item) {
-  const a = item.attributes;
-  const groups = rel(item, 'scanlation_group').map((g) => ({ id: g.id, name: g.attributes?.name }));
-  const manga = rel(item, 'manga')[0];
-  return {
-    id: item.id,
-    chapter: a.chapter,
-    volume: a.volume,
-    title: a.title,
-    language: a.translatedLanguage,
-    pages: a.pages,
-    externalUrl: a.externalUrl,
-    publishAt: a.publishAt,
-    readableAt: a.readableAt,
-    groups: groups.filter((g) => g.name),
-    mangaId: manga?.id,
-    manga: manga?.attributes ? normalizeManga({ ...manga, relationships: [] }) : null,
-  };
-}
-
-export function chapterLabel(ch) {
-  if (!ch) return '';
-  const num = ch.chapter ? `Chương ${ch.chapter}` : 'Oneshot';
-  return ch.volume ? `Tập ${ch.volume} · ${num}` : num;
 }

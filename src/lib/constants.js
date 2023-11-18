@@ -1,56 +1,92 @@
-export const LANGUAGES = {
-  vi: 'Tiếng Việt',
-  en: 'English',
-  ja: '日本語',
-  'ja-ro': 'Romaji',
-  ko: '한국어',
-  zh: '中文',
-  'zh-hk': '中文 (HK)',
-  'es-la': 'Español (LATAM)',
-  es: 'Español',
-  fr: 'Français',
-  'pt-br': 'Português (BR)',
-  id: 'Bahasa Indonesia',
-  th: 'ไทย',
-  ru: 'Русский',
-  de: 'Deutsch',
-  it: 'Italiano',
-};
-
 export const STATUS = {
-  ongoing: { label: 'Đang tiến hành', color: 'bg-emerald-500' },
-  completed: { label: 'Hoàn thành', color: 'bg-sky-500' },
-  hiatus: { label: 'Tạm ngưng', color: 'bg-amber-500' },
-  cancelled: { label: 'Đã huỷ', color: 'bg-zinc-500' },
+  RELEASING: { label: 'Đang phát hành', color: 'bg-emerald-500' },
+  FINISHED: { label: 'Hoàn thành', color: 'bg-sky-500' },
+  HIATUS: { label: 'Tạm ngưng', color: 'bg-amber-500' },
+  NOT_YET_RELEASED: { label: 'Sắp ra mắt', color: 'bg-violet-500' },
+  CANCELLED: { label: 'Đã huỷ', color: 'bg-zinc-500' },
 };
 
-export const DEMOGRAPHICS = {
-  shounen: 'Shounen',
-  shoujo: 'Shoujo',
-  seinen: 'Seinen',
-  josei: 'Josei',
-  none: 'Khác',
+export const FORMATS = {
+  MANGA: 'Manga',
+  ONE_SHOT: 'Oneshot',
+  NOVEL: 'Light novel',
 };
 
-export const CONTENT_RATINGS = {
-  safe: 'An toàn',
-  suggestive: 'Gợi cảm',
-  erotica: 'Nhạy cảm',
+export const COUNTRIES = {
+  JP: 'Manga (Nhật)',
+  KR: 'Manhwa (Hàn)',
+  CN: 'Manhua (Trung)',
+  TW: 'Đài Loan',
 };
 
 export const SORT_OPTIONS = {
-  relevance: { label: 'Liên quan nhất', order: { relevance: 'desc' } },
-  followedCount: { label: 'Theo dõi nhiều', order: { followedCount: 'desc' } },
-  latestUploadedChapter: { label: 'Mới cập nhật', order: { latestUploadedChapter: 'desc' } },
-  createdAt: { label: 'Mới thêm', order: { createdAt: 'desc' } },
-  rating: { label: 'Đánh giá cao', order: { rating: 'desc' } },
-  title: { label: 'Tên A → Z', order: { title: 'asc' } },
-  year: { label: 'Năm phát hành', order: { year: 'desc' } },
+  POPULARITY_DESC: 'Phổ biến nhất',
+  TRENDING_DESC: 'Đang thịnh hành',
+  SCORE_DESC: 'Điểm cao nhất',
+  FAVOURITES_DESC: 'Yêu thích nhiều',
+  START_DATE_DESC: 'Mới nhất',
+  START_DATE: 'Cũ nhất',
+  TITLE_ROMAJI: 'Tên A → Z',
+  SEARCH_MATCH: 'Liên quan nhất',
 };
 
-export const TAG_GROUP_LABELS = {
-  genre: 'Thể loại',
-  theme: 'Chủ đề',
-  format: 'Định dạng',
-  content: 'Nội dung',
+export const GENRE_VI = {
+  Action: 'Hành động',
+  Adventure: 'Phiêu lưu',
+  Comedy: 'Hài hước',
+  Drama: 'Chính kịch',
+  Ecchi: 'Ecchi',
+  Fantasy: 'Giả tưởng',
+  Horror: 'Kinh dị',
+  'Mahou Shoujo': 'Ma pháp thiếu nữ',
+  Mecha: 'Mecha',
+  Music: 'Âm nhạc',
+  Mystery: 'Bí ẩn',
+  Psychological: 'Tâm lý',
+  Romance: 'Lãng mạn',
+  'Sci-Fi': 'Khoa học viễn tưởng',
+  'Slice of Life': 'Đời thường',
+  Sports: 'Thể thao',
+  Supernatural: 'Siêu nhiên',
+  Thriller: 'Giật gân',
+};
+
+export const genreLabel = (g) => GENRE_VI[g] ?? g;
+
+export const RELATION_LABELS = {
+  ADAPTATION: 'Chuyển thể',
+  PREQUEL: 'Phần trước',
+  SEQUEL: 'Phần sau',
+  PARENT: 'Truyện gốc',
+  SIDE_STORY: 'Ngoại truyện',
+  CHARACTER: 'Chung nhân vật',
+  SUMMARY: 'Tóm tắt',
+  ALTERNATIVE: 'Phiên bản khác',
+  SPIN_OFF: 'Spin-off',
+  OTHER: 'Khác',
+  SOURCE: 'Nguyên tác',
+  COMPILATION: 'Tuyển tập',
+  CONTAINS: 'Bao gồm',
+};
+
+export const ROLE_LABELS = {
+  MAIN: 'Chính',
+  SUPPORTING: 'Phụ',
+  BACKGROUND: 'Nền',
+  'Story & Art': 'Tác giả & Hoạ sĩ',
+  Story: 'Tác giả',
+  Art: 'Hoạ sĩ',
+};
+
+export const SOURCE_LABELS = {
+  ORIGINAL: 'Nguyên tác',
+  LIGHT_NOVEL: 'Light novel',
+  NOVEL: 'Tiểu thuyết',
+  WEB_NOVEL: 'Web novel',
+  VIDEO_GAME: 'Trò chơi',
+  OTHER: 'Khác',
+  MANGA: 'Manga',
+  ANIME: 'Anime',
+  VISUAL_NOVEL: 'Visual novel',
+  DOUJINSHI: 'Doujinshi',
 };

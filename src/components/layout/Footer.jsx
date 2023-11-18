@@ -9,14 +9,14 @@ export default function Footer() {
         <div className="space-y-3 lg:col-span-2">
           <Logo />
           <p className="max-w-md text-sm text-zinc-500 dark:text-zinc-400">
-            Đọc manga miễn phí, không quảng cáo, không cần tài khoản. Dữ liệu và hình ảnh được cung cấp bởi{' '}
+            Khám phá manga, manhwa, manhua miễn phí, không quảng cáo, không cần tài khoản. Dữ liệu được cung cấp bởi{' '}
             <a
-              href="https://mangadex.org"
+              href="https://anilist.co"
               target="_blank"
               rel="noreferrer"
               className="font-medium text-brand-600 hover:underline"
             >
-              MangaDex
+              AniList
             </a>
             .
           </p>
@@ -45,7 +45,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-zinc-200 py-5 text-center text-xs text-zinc-500 dark:border-zinc-800">
-        © {new Date().getFullYear()} eManga. Dự án phi lợi nhuận, không liên kết với MangaDex.
+        © {new Date().getFullYear()} eManga. Dự án phi lợi nhuận, không liên kết với AniList.
       </div>
     </footer>
   );

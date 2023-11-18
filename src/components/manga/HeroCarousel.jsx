@@ -1,17 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import clsx from 'clsx';
 import Cover from '../ui/Cover';
 import { Skeleton } from '../ui/States';
-import { STATUS } from '../../lib/constants';
-
-function stripMarkdown(text = '') {
-  return text
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    .replace(/[*_#>`]/g, '')
-    .split(/\n-{3,}|\n\n/)[0];
-}
+import { ScoreBadge } from './MangaCard';
+import { STATUS, genreLabel } from '../../lib/constants';
+import { plainText } from '../../lib/normalize';
 
 export default function HeroCarousel({ items, loading }) {
   const [index, setIndex] = useState(0);
@@ -35,6 +30,7 @@ export default function HeroCarousel({ items, loading }) {
   }
 
   const m = items[index];
+  const backdrop = m.banner || m.cover;
   return (
     <div className="container-page pt-6">
       <div
@@ -42,53 +38,48 @@ export default function HeroCarousel({ items, loading }) {
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        {/* blurred backdrop */}
         <div
           key={m.id + '-bg'}
-          className="absolute inset-0 animate-fade-in scale-110 bg-cover bg-center opacity-40 blur-2xl"
-          style={{ backgroundImage: m.cover ? `url(${m.cover})` : undefined }}
+          className={clsx(
+            'absolute inset-0 animate-fade-in bg-cover bg-center',
+            m.banner ? 'opacity-50' : 'scale-110 opacity-40 blur-2xl'
+          )}
+          style={{ backgroundImage: backdrop ? `url(${backdrop})` : undefined }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-zinc-950/10" />
 
         <div key={m.id} className="relative flex min-h-[340px] animate-fade-in items-center gap-8 p-6 sm:min-h-[400px] sm:p-10">
           <div className="max-w-xl flex-1">
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-400">
-              #{index + 1} Nổi bật
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-400">#{index + 1} Thịnh hành</p>
             <h1 className="mt-2 line-clamp-2 text-2xl font-extrabold leading-tight sm:text-4xl">{m.title}</h1>
-            <div className="mt-3 flex flex-wrap gap-1.5">
+            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              <ScoreBadge score={m.score} className="bg-white/15" />
               {STATUS[m.status] && (
-                <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium">
-                  {STATUS[m.status].label}
-                </span>
+                <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium">{STATUS[m.status].label}</span>
               )}
-              {m.tags
-                .filter((t) => t.group === 'genre')
-                .slice(0, 4)
-                .map((t) => (
-                  <span key={t.id} className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs text-zinc-300">
-                    {t.name}
-                  </span>
-                ))}
+              {m.genres.slice(0, 4).map((g) => (
+                <span key={g} className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs text-zinc-300">
+                  {genreLabel(g)}
+                </span>
+              ))}
             </div>
-            <p className="mt-4 line-clamp-3 text-sm text-zinc-300 sm:text-base">{stripMarkdown(m.description)}</p>
-            {m.authors.length > 0 && <p className="mt-3 text-sm text-zinc-400">{m.authors.join(', ')}</p>}
+            <p className="mt-4 line-clamp-3 text-sm text-zinc-300 sm:text-base">{plainText(m.description)}</p>
             <div className="mt-6 flex gap-3">
               <Link to={`/manga/${m.id}`} className="btn-primary">
-                <BookOpen className="h-4 w-4" /> Đọc ngay
+                <Info className="h-4 w-4" /> Xem chi tiết
               </Link>
             </div>
           </div>
           <Link to={`/manga/${m.id}`} className="hidden w-48 shrink-0 md:block lg:w-56">
-            <Cover src={m.cover} alt={m.title} eager className="shadow-2xl ring-1 ring-white/10" />
+            <Cover src={m.cover} alt={m.title} color={m.color} eager className="shadow-2xl ring-1 ring-white/10" />
           </Link>
         </div>
 
         <div className="absolute bottom-4 right-4 flex items-center gap-2 sm:bottom-6 sm:right-6">
-          <button type="button" onClick={() => go(-1)} className="btn-icon btn rounded-full bg-white/10 hover:bg-white/20" aria-label="Trước">
+          <button type="button" onClick={() => go(-1)} className="btn btn-icon rounded-full bg-white/10 hover:bg-white/20" aria-label="Trước">
             <ChevronLeft className="h-5 w-5" />
           </button>
-          <button type="button" onClick={() => go(1)} className="btn-icon btn rounded-full bg-white/10 hover:bg-white/20" aria-label="Sau">
+          <button type="button" onClick={() => go(1)} className="btn btn-icon rounded-full bg-white/10 hover:bg-white/20" aria-label="Sau">
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>

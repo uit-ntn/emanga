@@ -1,122 +1,84 @@
-import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, Flame, Sparkles, Tags } from 'lucide-react';
+import { CalendarClock, Flame, Sparkles, Tags, Trophy } from 'lucide-react';
 import HeroCarousel from '../components/manga/HeroCarousel';
 import MangaGrid, { MangaRow } from '../components/manga/MangaGrid';
 import Section from '../components/ui/Section';
 import { ErrorState } from '../components/ui/States';
-import { useLatestChapters, useMangaSearch, useTags } from '../hooks/queries';
+import { useGenresAndTags, useMangaSearch } from '../hooks/queries';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import { useSettings } from '../store/settings';
-import { timeAgo } from '../lib/format';
+import { genreLabel } from '../lib/constants';
 
-const FEATURED_GENRES = ['Action', 'Romance', 'Comedy', 'Fantasy', 'Isekai', 'Slice of Life', 'Drama', 'Horror', 'Sports', 'Mystery'];
-
-function useLatestUpdates(languages, contentRating) {
-  const chapters = useLatestChapters({ limit: 64, languages, contentRating });
-
-  // One entry per manga, keep the newest chapter
-  const latestByManga = useMemo(() => {
-    const map = new Map();
-    (chapters.data ?? []).forEach((c) => {
-      if (c.mangaId && !map.has(c.mangaId)) map.set(c.mangaId, c);
-    });
-    return map;
-  }, [chapters.data]);
-
-  const ids = [...latestByManga.keys()].slice(0, 18);
-  const manga = useMangaSearch(
-    { ids, limit: ids.length, contentRating, order: undefined },
-    { enabled: ids.length > 0 }
-  );
-
-  const items = useMemo(() => {
-    if (!manga.data) return [];
-    const byId = new Map(manga.data.items.map((m) => [m.id, m]));
-    return ids.map((id) => byId.get(id)).filter(Boolean);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [manga.data, ids.join()]);
-
-  return {
-    items,
-    latestByManga,
-    isLoading: chapters.isLoading || manga.isLoading,
-    error: chapters.error || manga.error,
-    refetch: () => (chapters.error ? chapters.refetch() : manga.refetch()),
-  };
+function Block({ query, children }) {
+  if (query.error) return <ErrorState error={query.error} onRetry={query.refetch} />;
+  return children;
 }
 
 export default function Home() {
   useDocumentTitle();
-  const contentRating = useSettings((s) => s.contentRating);
-  const languages = useSettings((s) => s.translatedLanguage);
+  const trending = useMangaSearch({ perPage: 20, sort: ['TRENDING_DESC', 'POPULARITY_DESC'] });
+  const popular = useMangaSearch({ perPage: 18, sort: ['POPULARITY_DESC'] });
+  const topRated = useMangaSearch({ perPage: 12, sort: ['SCORE_DESC'] });
+  const manhwa = useMangaSearch({ perPage: 18, sort: ['TRENDING_DESC'], country: 'KR' });
+  const upcoming = useMangaSearch({ perPage: 12, sort: ['POPULARITY_DESC'], status: ['NOT_YET_RELEASED'] });
+  const { data: meta } = useGenresAndTags();
 
-  const base = { contentRating, availableTranslatedLanguage: languages };
-  const featured = useMangaSearch({ ...base, limit: 8, order: { followedCount: 'desc' } });
-  const popular = useMangaSearch({ ...base, limit: 18, offset: 8, order: { followedCount: 'desc' } });
-  const recent = useMangaSearch({ ...base, limit: 12, order: { createdAt: 'desc' } });
-  const latest = useLatestUpdates(languages, contentRating);
-  const { data: tags } = useTags();
-
-  const genreLinks = (tags ?? []).filter((t) => FEATURED_GENRES.includes(t.name));
+  const featured = trending.data?.items.filter((m) => m.banner).slice(0, 8);
+  const trendingGrid = trending.data?.items.slice(0, 12);
 
   return (
     <div className="pb-8">
-      {featured.error ? (
+      {trending.error ? (
         <div className="container-page pt-6">
-          <ErrorState error={featured.error} onRetry={featured.refetch} />
+          <ErrorState error={trending.error} onRetry={trending.refetch} />
         </div>
       ) : (
-        <HeroCarousel items={featured.data?.items} loading={featured.isLoading} />
+        <HeroCarousel items={featured} loading={trending.isLoading} />
       )}
 
-      <Section title="Mới cập nhật" icon={Clock} to="/browse?sort=latestUploadedChapter">
-        {latest.error ? (
-          <ErrorState error={latest.error} onRetry={latest.refetch} />
-        ) : (
-          <MangaGrid
-            items={latest.items}
-            loading={latest.isLoading}
-            skeletons={12}
-            getMeta={(m) => {
-              const c = latest.latestByManga.get(m.id);
-              return c?.chapter ? `Ch. ${c.chapter}` : null;
-            }}
-            getSubtitle={(m) => timeAgo(latest.latestByManga.get(m.id)?.readableAt)}
-          />
-        )}
+      <Section title="Đang thịnh hành" icon={Flame} to="/browse?sort=TRENDING_DESC">
+        <Block query={trending}>
+          <MangaGrid items={trendingGrid} loading={trending.isLoading} />
+        </Block>
       </Section>
 
-      <Section title="Phổ biến" icon={Flame} to="/browse?sort=followedCount">
-        {popular.error ? (
-          <ErrorState error={popular.error} onRetry={popular.refetch} />
-        ) : (
-          <MangaRow items={popular.data?.items} loading={popular.isLoading} />
-        )}
+      <Section title="Manhwa nổi bật" icon={Sparkles} to="/browse?country=KR&sort=TRENDING_DESC">
+        <Block query={manhwa}>
+          <MangaRow items={manhwa.data?.items} loading={manhwa.isLoading} />
+        </Block>
       </Section>
 
-      {genreLinks.length > 0 && (
+      {meta?.genres && (
         <Section title="Thể loại" icon={Tags} to="/browse" linkLabel="Tìm nâng cao">
           <div className="flex flex-wrap gap-2">
-            {genreLinks.map((t) => (
+            {meta.genres.map((g) => (
               <Link
-                key={t.id}
-                to={`/browse?tags=${t.id}`}
+                key={g}
+                to={`/browse?genres=${encodeURIComponent(g)}`}
                 className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-medium transition hover:border-brand-500 hover:text-brand-600 dark:border-zinc-800 dark:bg-zinc-900"
               >
-                {t.name}
+                {genreLabel(g)}
               </Link>
             ))}
           </div>
         </Section>
       )}
 
-      <Section title="Mới thêm" icon={Sparkles} to="/browse?sort=createdAt">
-        {recent.error ? (
-          <ErrorState error={recent.error} onRetry={recent.refetch} />
-        ) : (
-          <MangaGrid items={recent.data?.items} loading={recent.isLoading} skeletons={12} />
-        )}
+      <Section title="Phổ biến mọi thời đại" icon={Trophy} to="/browse?sort=POPULARITY_DESC">
+        <Block query={popular}>
+          <MangaRow items={popular.data?.items} loading={popular.isLoading} />
+        </Block>
+      </Section>
+
+      <Section title="Điểm cao nhất" icon={Trophy} to="/browse?sort=SCORE_DESC">
+        <Block query={topRated}>
+          <MangaGrid items={topRated.data?.items} loading={topRated.isLoading} getMeta={(m, i) => `#${i + 1}`} />
+        </Block>
+      </Section>
+
+      <Section title="Sắp ra mắt" icon={CalendarClock} to="/browse?status=NOT_YET_RELEASED">
+        <Block query={upcoming}>
+          <MangaRow items={upcoming.data?.items} loading={upcoming.isLoading} />
+        </Block>
       </Section>
     </div>
   );

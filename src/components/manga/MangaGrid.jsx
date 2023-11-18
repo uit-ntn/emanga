@@ -1,15 +1,10 @@
 import clsx from 'clsx';
 import MangaCard, { MangaCardSkeleton } from './MangaCard';
-import { useStatistics } from '../../hooks/queries';
 
 const BASE = 'grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4';
 const WIDE = 'lg:grid-cols-6';
 
-/** Grid of manga cards; fetches ratings for all visible items in one request. */
 export default function MangaGrid({ items, loading, skeletons = 12, getSubtitle, getMeta, columns = WIDE, className }) {
-  const ids = items?.map((m) => m.id) ?? [];
-  const { data: stats } = useStatistics(ids);
-
   if (loading && !items?.length) {
     return (
       <div className={clsx(BASE, columns, className)}>
@@ -22,23 +17,15 @@ export default function MangaGrid({ items, loading, skeletons = 12, getSubtitle,
 
   return (
     <div className={clsx(BASE, columns, className)}>
-      {items.map((m) => (
-        <MangaCard
-          key={m.id}
-          manga={m}
-          stats={stats?.[m.id]}
-          subtitle={getSubtitle?.(m)}
-          meta={getMeta?.(m)}
-        />
+      {(items ?? []).map((m, i) => (
+        <MangaCard key={m.id} manga={m} subtitle={getSubtitle?.(m)} meta={getMeta?.(m, i)} />
       ))}
     </div>
   );
 }
 
-/** Horizontal scroll row, used on the home page. */
-export function MangaRow({ items, loading }) {
-  const ids = items?.map((m) => m.id) ?? [];
-  const { data: stats } = useStatistics(ids);
+/** Horizontal scroll row, used on the home and detail pages. */
+export function MangaRow({ items, loading, getSubtitle }) {
   const cell = 'w-36 shrink-0 snap-start sm:w-40 lg:w-44';
   return (
     <div className="scrollbar-none -mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
@@ -48,7 +35,9 @@ export function MangaRow({ items, loading }) {
               <MangaCardSkeleton />
             </div>
           ))
-        : items.map((m) => <MangaCard key={m.id} manga={m} stats={stats?.[m.id]} className={cell} />)}
+        : (items ?? []).map((m) => (
+            <MangaCard key={m.id} manga={m} subtitle={getSubtitle?.(m)} className={cell} />
+          ))}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Check, Minus, Search } from 'lucide-react';
 import clsx from 'clsx';
-import { useTags } from '../../hooks/queries';
-import { CONTENT_RATINGS, DEMOGRAPHICS, LANGUAGES, STATUS, TAG_GROUP_LABELS } from '../../lib/constants';
+import { useGenresAndTags } from '../../hooks/queries';
+import { COUNTRIES, FORMATS, STATUS, genreLabel } from '../../lib/constants';
 import { Skeleton } from '../ui/States';
 
 function Chip({ active, onClick, children }) {
@@ -34,13 +34,13 @@ function Group({ title, children }) {
 
 const toggle = (list, v) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
-/** Tag button cycles: neutral -> include -> exclude -> neutral */
-function TagButton({ tag, state, onClick }) {
+/** Button cycles: neutral -> include -> exclude -> neutral */
+function TriButton({ label, title, state, onClick }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      title={state === 'exclude' ? 'Đang loại trừ' : state === 'include' ? 'Đang chọn' : 'Bấm để chọn'}
+      title={title}
       className={clsx(
         'inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition',
         state === 'include' && 'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
@@ -50,32 +50,34 @@ function TagButton({ tag, state, onClick }) {
     >
       {state === 'include' && <Check className="h-3 w-3" />}
       {state === 'exclude' && <Minus className="h-3 w-3" />}
-      {tag.name}
+      {label}
     </button>
   );
 }
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 export default function FilterPanel({ filters, onChange }) {
-  const { data: tags, isLoading } = useTags();
+  const { data: meta, isLoading } = useGenresAndTags();
   const [tagQuery, setTagQuery] = useState('');
 
-  const grouped = useMemo(() => {
-    const q = tagQuery.trim().toLowerCase();
-    const out = {};
-    (tags ?? [])
-      .filter((t) => !q || t.name.toLowerCase().includes(q))
-      .forEach((t) => {
-        (out[t.group] ||= []).push(t);
-      });
-    return out;
-  }, [tags, tagQuery]);
-
-  const cycleTag = (id) => {
-    const { tags: inc, exclude } = filters;
-    if (inc.includes(id)) onChange({ tags: inc.filter((x) => x !== id), exclude: [...exclude, id] });
-    else if (exclude.includes(id)) onChange({ exclude: exclude.filter((x) => x !== id) });
-    else onChange({ tags: [...inc, id] });
+  const cycle = (incKey, excKey, value) => {
+    const inc = filters[incKey];
+    const exc = filters[excKey];
+    if (inc.includes(value)) onChange({ [incKey]: inc.filter((x) => x !== value), [excKey]: [...exc, value] });
+    else if (exc.includes(value)) onChange({ [excKey]: exc.filter((x) => x !== value) });
+    else onChange({ [incKey]: [...inc, value] });
   };
+  const triState = (incKey, excKey, v) =>
+    filters[incKey].includes(v) ? 'include' : filters[excKey].includes(v) ? 'exclude' : null;
+
+  const tagsByCategory = useMemo(() => {
+    const q = tagQuery.trim().toLowerCase();
+    if (!q) return null;
+    return (meta?.tags ?? []).filter((t) => t.name.toLowerCase().includes(q)).slice(0, 40);
+  }, [meta, tagQuery]);
+
+  const selectedTags = [...filters.tags, ...filters.excludeTags];
 
   return (
     <div className="space-y-6">
@@ -87,76 +89,108 @@ export default function FilterPanel({ filters, onChange }) {
         ))}
       </Group>
 
-      <Group title="Đối tượng">
-        {Object.entries(DEMOGRAPHICS).map(([k, v]) => (
-          <Chip key={k} active={filters.demo.includes(k)} onClick={() => onChange({ demo: toggle(filters.demo, k) })}>
+      <Group title="Quốc gia">
+        {Object.entries(COUNTRIES).map(([k, v]) => (
+          <Chip key={k} active={filters.country === k} onClick={() => onChange({ country: filters.country === k ? '' : k })}>
             {v}
           </Chip>
         ))}
       </Group>
 
-      <Group title="Có bản dịch">
-        {['vi', 'en', 'ja', 'ko', 'zh'].map((k) => (
-          <Chip key={k} active={filters.lang.includes(k)} onClick={() => onChange({ lang: toggle(filters.lang, k) })}>
-            {LANGUAGES[k]}
-          </Chip>
-        ))}
-      </Group>
-
-      <Group title="Mức nội dung">
-        {Object.entries(CONTENT_RATINGS).map(([k, v]) => (
-          <Chip
-            key={k}
-            active={filters.rating.includes(k)}
-            onClick={() => {
-              const next = toggle(filters.rating, k);
-              if (next.length) onChange({ rating: next });
-            }}
-          >
+      <Group title="Định dạng">
+        {Object.entries(FORMATS).map(([k, v]) => (
+          <Chip key={k} active={filters.format.includes(k)} onClick={() => onChange({ format: toggle(filters.format, k) })}>
             {v}
           </Chip>
         ))}
       </Group>
+
+      <fieldset>
+        <legend className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">Năm phát hành</legend>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            className="input"
+            placeholder="Từ"
+            min={1950}
+            max={CURRENT_YEAR + 2}
+            value={filters.yearFrom}
+            onChange={(e) => onChange({ yearFrom: e.target.value })}
+            aria-label="Từ năm"
+          />
+          <span className="text-zinc-400">–</span>
+          <input
+            type="number"
+            className="input"
+            placeholder="Đến"
+            min={1950}
+            max={CURRENT_YEAR + 2}
+            value={filters.yearTo}
+            onChange={(e) => onChange({ yearTo: e.target.value })}
+            aria-label="Đến năm"
+          />
+        </div>
+      </fieldset>
 
       <div>
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Thẻ</p>
-          <p className="text-xs text-zinc-500">Bấm 1 lần để chọn, 2 lần để loại trừ</p>
-        </div>
-        <div className="relative mb-4">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-          <input
-            className="input pl-9"
-            placeholder="Lọc thẻ..."
-            value={tagQuery}
-            onChange={(e) => setTagQuery(e.target.value)}
-          />
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Thể loại</p>
+          <p className="text-[11px] text-zinc-500">1 lần: chọn · 2 lần: loại trừ</p>
         </div>
         {isLoading ? (
           <div className="flex flex-wrap gap-2">
-            {Array.from({ length: 24 }, (_, i) => (
+            {Array.from({ length: 18 }, (_, i) => (
               <Skeleton key={i} className="h-7 w-20" />
             ))}
           </div>
         ) : (
-          <div className="space-y-4">
-            {['genre', 'theme', 'format', 'content'].map(
-              (g) =>
-                grouped[g]?.length > 0 && (
-                  <div key={g}>
-                    <p className="mb-2 text-sm font-semibold">{TAG_GROUP_LABELS[g]}</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {grouped[g].map((t) => (
-                        <TagButton
-                          key={t.id}
-                          tag={t}
-                          state={filters.tags.includes(t.id) ? 'include' : filters.exclude.includes(t.id) ? 'exclude' : null}
-                          onClick={() => cycleTag(t.id)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )
+          <div className="flex flex-wrap gap-1.5">
+            {(meta?.genres ?? []).map((g) => (
+              <TriButton
+                key={g}
+                label={genreLabel(g)}
+                state={triState('genres', 'excludeGenres', g)}
+                onClick={() => cycle('genres', 'excludeGenres', g)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">Thẻ (tag)</p>
+        {selectedTags.length > 0 && (
+          <div className="mb-3 flex flex-wrap gap-1.5">
+            {selectedTags.map((t) => (
+              <TriButton key={t} label={t} state={triState('tags', 'excludeTags', t)} onClick={() => cycle('tags', 'excludeTags', t)} />
+            ))}
+          </div>
+        )}
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <input
+            className="input pl-9"
+            placeholder="Tìm tag: Isekai, Time Skip..."
+            value={tagQuery}
+            onChange={(e) => setTagQuery(e.target.value)}
+          />
+        </div>
+        {tagsByCategory && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {tagsByCategory.length ? (
+              tagsByCategory
+                .filter((t) => !selectedTags.includes(t.name))
+                .map((t) => (
+                  <TriButton
+                    key={t.name}
+                    label={t.name}
+                    title={t.description}
+                    state={null}
+                    onClick={() => cycle('tags', 'excludeTags', t.name)}
+                  />
+                ))
+            ) : (
+              <p className="text-sm text-zinc-500">Không có tag phù hợp</p>
             )}
           </div>
         )}

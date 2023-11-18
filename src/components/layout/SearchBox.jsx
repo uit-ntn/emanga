@@ -4,7 +4,7 @@ import { Loader2, Search, X } from 'lucide-react';
 import clsx from 'clsx';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useMangaSearch } from '../../hooks/queries';
-import { useSettings } from '../../store/settings';
+import { FORMATS } from '../../lib/constants';
 
 /** Header search with instant suggestions. Ctrl/⌘+K or "/" to focus. */
 export default function SearchBox({ className }) {
@@ -16,11 +16,10 @@ export default function SearchBox({ className }) {
   const navigate = useNavigate();
   const location = useLocation();
   const listId = useId();
-  const contentRating = useSettings((s) => s.contentRating);
 
   const q = useDebounce(value.trim(), 300);
   const { data, isFetching } = useMangaSearch(
-    { title: q, limit: 6, order: { relevance: 'desc' }, contentRating },
+    { search: q, perPage: 6, sort: ['SEARCH_MATCH'] },
     { enabled: q.length >= 2 }
   );
   const results = q.length >= 2 ? data?.items ?? [] : [];
@@ -56,7 +55,7 @@ export default function SearchBox({ className }) {
     if (active >= 0 && results[active]) {
       navigate(`/manga/${results[active].id}`);
     } else if (value.trim()) {
-      navigate(`/browse?q=${encodeURIComponent(value.trim())}&sort=relevance`);
+      navigate(`/browse?q=${encodeURIComponent(value.trim())}&sort=SEARCH_MATCH`);
     }
     setValue('');
   };
@@ -138,7 +137,7 @@ export default function SearchBox({ className }) {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold">{m.title}</p>
                     <p className="truncate text-xs text-zinc-500">
-                      {[m.authors[0], m.year].filter(Boolean).join(' · ')}
+                      {[FORMATS[m.format], m.year, m.score ? `★ ${(m.score / 10).toFixed(1)}` : null].filter(Boolean).join(' · ')}
                     </p>
                   </div>
                 </button>

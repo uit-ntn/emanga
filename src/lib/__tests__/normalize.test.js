@@ -1,67 +1,45 @@
 import { describe, expect, it } from 'vitest';
-import { buildQuery } from '../../api/client';
-import { chapterLabel, normalizeManga, pickTitle } from '../normalize';
+import { cleanVariables } from '../../api/client';
+import { cleanDescription, normalizeManga, pickTitle, plainText } from '../normalize';
 import { timeAgo } from '../format';
 
-describe('buildQuery', () => {
-  it('serialises arrays, order objects and skips empty values', () => {
-    const qs = buildQuery({
-      title: 'one piece',
-      includes: ['cover_art', 'author'],
-      order: { followedCount: 'desc' },
-      year: undefined,
-      status: '',
-    });
-    const sp = new URLSearchParams(qs.slice(1));
-    expect(sp.get('title')).toBe('one piece');
-    expect(sp.getAll('includes[]')).toEqual(['cover_art', 'author']);
-    expect(sp.get('order[followedCount]')).toBe('desc');
-    expect(sp.has('year')).toBe(false);
-    expect(sp.has('status')).toBe(false);
-  });
-
-  it('returns empty string without params', () => {
-    expect(buildQuery()).toBe('');
+describe('cleanVariables', () => {
+  it('drops empty values so AniList ignores the filter', () => {
+    expect(cleanVariables({ a: 1, b: undefined, c: '', d: [], e: ['x'], f: null, g: 0 })).toEqual({ a: 1, e: ['x'], g: 0 });
   });
 });
 
 describe('pickTitle', () => {
-  it('prefers vietnamese alt title over japanese main title', () => {
-    expect(pickTitle({ title: { 'ja-ro': 'Shingeki' }, altTitles: [{ vi: 'Đại chiến Titan' }] })).toBe(
-      'Đại chiến Titan'
-    );
+  it('prefers english then romaji then native', () => {
+    expect(pickTitle({ english: 'Attack on Titan', romaji: 'Shingeki no Kyojin' })).toBe('Attack on Titan');
+    expect(pickTitle({ romaji: 'Shingeki no Kyojin', native: '進撃の巨人' })).toBe('Shingeki no Kyojin');
+    expect(pickTitle({})).toBe('Không có tiêu đề');
   });
-  it('falls back to romaji', () => {
-    expect(pickTitle({ title: { 'ja-ro': 'Shingeki' }, altTitles: [] })).toBe('Shingeki');
+});
+
+describe('cleanDescription', () => {
+  it('converts AniList html/markdown and removes spoilers', () => {
+    const out = cleanDescription('Hello<br><br><i>world</i> __bold__ ~!secret!~ &quot;q&quot;');
+    expect(out).toBe('Hello\n\n_world_ **bold**  "q"');
+  });
+  it('plainText strips formatting', () => {
+    expect(plainText('<b>Hi</b> [link](https://x.y)')).toBe('Hi link');
   });
 });
 
 describe('normalizeManga', () => {
-  it('extracts cover, authors and tags', () => {
+  it('maps AniList media to card model', () => {
     const m = normalizeManga({
-      id: 'abc',
-      attributes: {
-        title: { en: 'Test' },
-        description: { en: 'Desc' },
-        status: 'ongoing',
-        tags: [{ id: 't1', attributes: { name: { en: 'Action' }, group: 'genre' } }],
-      },
-      relationships: [
-        { type: 'cover_art', attributes: { fileName: 'c.jpg' } },
-        { type: 'author', attributes: { name: 'Oda' } },
-      ],
+      id: 1,
+      title: { romaji: 'Berserk' },
+      coverImage: { extraLarge: 'xl.jpg', large: 'l.jpg', color: '#fff' },
+      averageScore: 93,
+      genres: ['Action'],
+      countryOfOrigin: 'JP',
+      startDate: { year: 1989 },
+      status: 'RELEASING',
     });
-    expect(m.title).toBe('Test');
-    expect(m.cover).toMatch(/\/covers\/abc\/c\.jpg\.512\.jpg$/);
-    expect(m.authors).toEqual(['Oda']);
-    expect(m.tags[0]).toEqual({ id: 't1', name: 'Action', group: 'genre' });
-  });
-});
-
-describe('chapterLabel', () => {
-  it('formats volume and chapter', () => {
-    expect(chapterLabel({ volume: '2', chapter: '10' })).toBe('Tập 2 · Chương 10');
-    expect(chapterLabel({ chapter: null })).toBe('Oneshot');
+    expect(m).toMatchObject({ id: 1, title: 'Berserk', cover: 'xl.jpg', coverSmall: 'l.jpg', score: 93, year: 1989 });
   });
 });
 
