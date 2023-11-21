@@ -28,6 +28,9 @@ export default function Footer() {
               <Link className="hover:text-brand-600" to="/browse">Khám phá</Link>
             </li>
             <li>
+              <Link className="hover:text-brand-600" to="/library">Tủ truyện</Link>
+            </li>
+            <li>
               <Link className="hover:text-brand-600" to="/about">Giới thiệu</Link>
             </li>
           </ul>

@@ -8,6 +8,7 @@ import SearchBox from './SearchBox';
 const NAV = [
   { to: '/', label: 'Trang chủ', end: true },
   { to: '/browse', label: 'Khám phá' },
+  { to: '/library', label: 'Tủ truyện' },
   { to: '/about', label: 'Giới thiệu' },
 ];
 

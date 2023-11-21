@@ -1,112 +1,99 @@
 import { createPersistedStore } from './createStore';
 
-const MAX_HISTORY = 200;
-const MAX_READ = 10000;
-
 /**
- * Everything is stored locally in the browser – no account required.
- *  follows:  mangaId -> { id, title, cover, status, addedAt }
- *  history:  mangaId -> { mangaId, title, cover, chapterId, chapter, volume, language, page, updatedAt }
- *  read:     chapterId -> timestamp
+ * Personal library stored locally in the browser – no account required.
+ * entries: id -> { id, title, cover, color, format, country, chapters, mangaStatus,
+ *                  status, progress, score, addedAt, updatedAt }
  */
-export const libraryStore = createPersistedStore('emanga:library', {
-  follows: {},
-  history: {},
-  read: {},
-});
+export const LIST_STATUS = {
+  READING: { label: 'Đang đọc', color: 'bg-emerald-500' },
+  PLANNING: { label: 'Dự định đọc', color: 'bg-sky-500' },
+  COMPLETED: { label: 'Đã đọc xong', color: 'bg-violet-500' },
+  PAUSED: { label: 'Tạm dừng', color: 'bg-amber-500' },
+  DROPPED: { label: 'Bỏ dở', color: 'bg-zinc-500' },
+};
 
+export const libraryStore = createPersistedStore('emanga:library', { entries: {} });
 export const useLibrary = libraryStore.useStore;
 
-const pickManga = (m) => ({ id: m.id, title: m.title, cover: m.coverSmall, status: m.status });
+// Migrate the old "follows" format (v1) to entries
+(() => {
+  const s = libraryStore.getState();
+  if (s.follows && Object.keys(s.follows).length) {
+    const entries = { ...s.entries };
+    Object.values(s.follows).forEach((f) => {
+      entries[f.id] ??= { id: f.id, title: f.title, cover: f.cover, status: 'PLANNING', progress: 0, score: 0, addedAt: f.addedAt, updatedAt: f.addedAt };
+    });
+    libraryStore.setState({ entries, follows: undefined, history: undefined, read: undefined });
+  }
+})();
 
-export function toggleFollow(manga) {
+const snapshot = (m) => ({
+  id: m.id,
+  title: m.title,
+  cover: m.coverSmall,
+  color: m.color,
+  format: m.format,
+  country: m.country,
+  chapters: m.chapters,
+  mangaStatus: m.status,
+  score: m.score,
+});
+
+/** Add or update an entry. `patch` may contain status, progress, userScore. */
+export function saveEntry(manga, patch) {
   libraryStore.setState((s) => {
-    const follows = { ...s.follows };
-    if (follows[manga.id]) delete follows[manga.id];
-    else follows[manga.id] = { ...pickManga(manga), addedAt: Date.now() };
-    return { ...s, follows };
-  });
-}
-
-export function removeFollow(id) {
-  libraryStore.setState((s) => {
-    const follows = { ...s.follows };
-    delete follows[id];
-    return { ...s, follows };
-  });
-}
-
-export function recordProgress(manga, chapter, page = 0) {
-  if (!manga?.id || !chapter?.id) return;
-  libraryStore.setState((s) => {
-    const prev = s.history[manga.id];
-    if (prev && prev.chapterId === chapter.id && prev.page === page) return s;
-
-    let history = {
-      ...s.history,
-      [manga.id]: {
-        mangaId: manga.id,
-        title: manga.title,
-        cover: manga.coverSmall,
-        chapterId: chapter.id,
-        chapter: chapter.chapter,
-        volume: chapter.volume,
-        language: chapter.language,
-        page,
-        updatedAt: Date.now(),
-      },
+    const prev = s.entries[manga.id];
+    const now = Date.now();
+    const next = {
+      status: 'PLANNING',
+      progress: 0,
+      userScore: 0,
+      addedAt: now,
+      ...prev,
+      ...snapshot(manga),
+      ...patch,
+      updatedAt: now,
     };
-    const entries = Object.values(history);
-    if (entries.length > MAX_HISTORY) {
-      entries.sort((a, b) => b.updatedAt - a.updatedAt);
-      history = Object.fromEntries(entries.slice(0, MAX_HISTORY).map((e) => [e.mangaId, e]));
+    if (next.chapters && next.progress > next.chapters) next.progress = next.chapters;
+    if (next.progress < 0) next.progress = 0;
+    // reaching the last chapter of a finished series marks it completed
+    if (patch.progress !== undefined && next.chapters && next.progress === next.chapters && next.mangaStatus === 'FINISHED') {
+      next.status = 'COMPLETED';
     }
-
-    let read = s.read[chapter.id] ? s.read : { ...s.read, [chapter.id]: Date.now() };
-    const readKeys = Object.keys(read);
-    if (readKeys.length > MAX_READ) {
-      read = Object.fromEntries(
-        Object.entries(read)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, MAX_READ)
-      );
-    }
-    return { ...s, history, read };
+    if (patch.progress > 0 && next.status === 'PLANNING') next.status = 'READING';
+    return { ...s, entries: { ...s.entries, [manga.id]: next } };
   });
 }
 
-export function removeHistory(mangaId) {
+export function removeEntry(id) {
   libraryStore.setState((s) => {
-    const history = { ...s.history };
-    delete history[mangaId];
-    return { ...s, history };
+    const entries = { ...s.entries };
+    delete entries[id];
+    return { ...s, entries };
   });
 }
 
-export function clearHistory() {
-  libraryStore.setState((s) => ({ ...s, history: {}, read: {} }));
-}
-
-export function setChapterRead(chapterId, isRead) {
-  libraryStore.setState((s) => {
-    const read = { ...s.read };
-    if (isRead) read[chapterId] = Date.now();
-    else delete read[chapterId];
-    return { ...s, read };
-  });
-}
-
-/** Export / import for moving data between devices. */
 export function exportLibrary() {
-  return JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), ...libraryStore.getState() }, null, 2);
+  return JSON.stringify({ app: 'emanga', version: 2, exportedAt: new Date().toISOString(), entries: libraryStore.getState().entries }, null, 2);
 }
 
+/** Merge an exported file into the current library; newer entries win. Returns number imported. */
 export function importLibrary(json) {
-  const data = JSON.parse(json);
-  if (!data || typeof data !== 'object' || !data.follows) throw new Error('File không hợp lệ');
-  libraryStore.setState((s) => ({
-    follows: { ...s.follows, ...data.follows },
-    history: { ...s.history, ...(data.history || {}) },
-    read: { ...s.read, ...(data.read || {}) },
-  }));
+  let data;
+  try {
+    data = JSON.parse(json);
+  } catch {
+    throw new Error('File không phải JSON hợp lệ.');
+  }
+  if (!data || data.app !== 'emanga' || typeof data.entries !== 'object') throw new Error('Đây không phải file sao lưu của eManga.');
+  const incoming = Object.values(data.entries).filter((e) => e && e.id && e.title && LIST_STATUS[e.status]);
+  libraryStore.setState((s) => {
+    const entries = { ...s.entries };
+    incoming.forEach((e) => {
+      if (!entries[e.id] || (e.updatedAt ?? 0) > (entries[e.id].updatedAt ?? 0)) entries[e.id] = e;
+    });
+    return { ...s, entries };
+  });
+  return incoming.length;
 }

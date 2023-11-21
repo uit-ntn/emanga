@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { CalendarClock, Flame, Sparkles, Tags, Trophy } from 'lucide-react';
+import { BookOpenCheck, CalendarClock, Flame, Sparkles, Tags, Trophy } from 'lucide-react';
 import HeroCarousel from '../components/manga/HeroCarousel';
 import MangaGrid, { MangaRow } from '../components/manga/MangaGrid';
 import Section from '../components/ui/Section';
@@ -7,6 +7,7 @@ import { ErrorState } from '../components/ui/States';
 import { useGenresAndTags, useMangaSearch } from '../hooks/queries';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { genreLabel } from '../lib/constants';
+import { useLibrary } from '../store/library';
 
 function Block({ query, children }) {
   if (query.error) return <ErrorState error={query.error} onRetry={query.refetch} />;
@@ -21,6 +22,12 @@ export default function Home() {
   const manhwa = useMangaSearch({ perPage: 18, sort: ['TRENDING_DESC'], country: 'KR' });
   const upcoming = useMangaSearch({ perPage: 12, sort: ['POPULARITY_DESC'], status: ['NOT_YET_RELEASED'] });
   const { data: meta } = useGenresAndTags();
+  const entries = useLibrary((s) => s.entries);
+  const reading = Object.values(entries)
+    .filter((e) => e.status === 'READING')
+    .sort((a, b) => b.updatedAt - a.updatedAt)
+    .slice(0, 12)
+    .map((e) => ({ ...e, coverSmall: e.cover, status: e.mangaStatus, genres: [], _progress: e.progress }));
 
   const featured = trending.data?.items.filter((m) => m.banner).slice(0, 8);
   const trendingGrid = trending.data?.items.slice(0, 12);
@@ -33,6 +40,12 @@ export default function Home() {
         </div>
       ) : (
         <HeroCarousel items={featured} loading={trending.isLoading} />
+      )}
+
+      {reading.length > 0 && (
+        <Section title="Bạn đang đọc" icon={BookOpenCheck} to="/library?status=READING" linkLabel="Tủ truyện">
+          <MangaRow items={reading} getSubtitle={(m) => `Đã đọc tới ch. ${m._progress}${m.chapters ? ` / ${m.chapters}` : ''}`} />
+        </Section>
       )}
 
       <Section title="Đang thịnh hành" icon={Flame} to="/browse?sort=TRENDING_DESC">

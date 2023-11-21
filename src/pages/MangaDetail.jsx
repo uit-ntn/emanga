@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Bookmark, BookmarkCheck, BookOpen, ExternalLink, Eye, EyeOff, Heart, Share2, Star, TrendingUp, Trophy } from 'lucide-react';
+import { BookOpen, ExternalLink, Eye, EyeOff, Heart, Share2, Star, TrendingUp, Trophy } from 'lucide-react';
 import clsx from 'clsx';
 import { MangaRow } from '../components/manga/MangaGrid';
 import Cover from '../components/ui/Cover';
@@ -10,7 +10,7 @@ import { useManga } from '../hooks/queries';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { COUNTRIES, FORMATS, RELATION_LABELS, ROLE_LABELS, SOURCE_LABELS, STATUS, genreLabel } from '../lib/constants';
 import { formatNumber } from '../lib/format';
-import { toggleFollow, useLibrary } from '../store/library';
+import { ProgressCard, TrackButton } from '../components/manga/TrackerPanel';
 
 function DetailSkeleton() {
   return (
@@ -84,7 +84,6 @@ function ScoreChart({ data }) {
 export default function MangaDetail() {
   const { id } = useParams();
   const { data: manga, isLoading, error, refetch } = useManga(id);
-  const isFollowed = useLibrary((s) => Boolean(s.follows[id]));
   const [expanded, setExpanded] = useState(false);
   const [showSpoilers, setShowSpoilers] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -177,15 +176,7 @@ export default function MangaDetail() {
                   <BookOpen className="h-4 w-4" /> Đọc trên {readLinks[0].site}
                 </a>
               )}
-              <button
-                type="button"
-                onClick={() => toggleFollow(manga)}
-                className={clsx('btn-secondary', isFollowed && 'text-brand-600 dark:text-brand-400')}
-                aria-pressed={isFollowed}
-              >
-                {isFollowed ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
-                {isFollowed ? 'Đang theo dõi' : 'Theo dõi'}
-              </button>
+              <TrackButton manga={manga} />
               <button type="button" onClick={share} className="btn-secondary">
                 <Share2 className="h-4 w-4" /> {copied ? 'Đã sao chép!' : 'Chia sẻ'}
               </button>
@@ -270,6 +261,7 @@ export default function MangaDetail() {
           </div>
 
           <aside className="space-y-6">
+            <ProgressCard manga={manga} />
             {(rated || popular) && (
               <div className="card space-y-2 p-4 text-sm">
                 {rated && (

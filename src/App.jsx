@@ -7,6 +7,7 @@ import { useThemeSync } from './hooks/useTheme';
 const Home = lazy(() => import('./pages/Home'));
 const Browse = lazy(() => import('./pages/Browse'));
 const MangaDetail = lazy(() => import('./pages/MangaDetail'));
+const Library = lazy(() => import('./pages/Library'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="browse" element={<Browse />} />
             <Route path="manga/:id" element={<MangaDetail />} />
+            <Route path="library" element={<Library />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
