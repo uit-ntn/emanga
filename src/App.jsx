@@ -8,6 +8,7 @@ const Home = lazy(() => import('./pages/Home'));
 const Browse = lazy(() => import('./pages/Browse'));
 const MangaDetail = lazy(() => import('./pages/MangaDetail'));
 const Library = lazy(() => import('./pages/Library'));
+const About = lazy(() => import('./pages/About'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="browse" element={<Browse />} />
             <Route path="manga/:id" element={<MangaDetail />} />
             <Route path="library" element={<Library />} />
+            <Route path="about" element={<About />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

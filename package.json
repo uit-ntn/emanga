@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "lint": "eslint src --ext js,jsx",
     "test": "vitest run",
-    "deploy": "vite build --base=/emanga-fe/ && gh-pages -d dist"
+    "deploy": "vite build --base=/emanga-fe/ && node -e \"require('fs').copyFileSync('dist/index.html','dist/404.html')\" && gh-pages -d dist"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.8.4",
