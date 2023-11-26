@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Compass, Database, Github, Globe, LibraryBig, Moon, Search, ShieldCheck, Smartphone } from 'lucide-react';
+import { Compass, Database, Facebook, Github, GraduationCap, Globe, LibraryBig, Moon, Search, ShieldCheck, Smartphone } from 'lucide-react';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { SCHOOL, TEAM } from '../lib/team';
 
 const FEATURES = [
   { icon: Compass, title: 'Khám phá', text: 'Bảng xếp hạng thịnh hành, phổ biến, điểm cao và truyện sắp ra mắt.' },
@@ -9,11 +10,6 @@ const FEATURES = [
   { icon: Globe, title: 'Đọc chính thức', text: 'Dẫn tới các nền tảng có bản quyền để bạn ủng hộ tác giả.' },
   { icon: Moon, title: 'Giao diện sáng / tối', text: 'Tự động theo hệ thống hoặc chọn thủ công.' },
   { icon: Smartphone, title: 'Mọi thiết bị', text: 'Thiết kế responsive, dùng tốt trên điện thoại, máy tính bảng và desktop.' },
-];
-
-const TEAM = [
-  { name: 'Nguyễn Thanh Nhân', role: 'Co-founder · Developer', github: 'uit-ntn', site: 'https://uit-ntn.github.io/portfolio/' },
-  { name: 'Thi', role: 'Co-founder · Designer', github: 'DT2K3' },
 ];
 
 export default function About() {
@@ -78,6 +74,9 @@ export default function About() {
 
       <section className="mt-16">
         <h2 className="section-title text-center">Đội ngũ</h2>
+        <p className="mt-2 flex items-center justify-center gap-2 text-sm text-zinc-500">
+          <GraduationCap className="h-4 w-4" /> Sinh viên {SCHOOL}
+        </p>
         <div className="mx-auto mt-6 grid max-w-2xl gap-4 sm:grid-cols-2">
           {TEAM.map((m) => (
             <div key={m.github} className="card flex items-center gap-4 p-5">
@@ -90,9 +89,12 @@ export default function About() {
               <div className="min-w-0">
                 <p className="font-bold">{m.name}</p>
                 <p className="text-sm text-zinc-500">{m.role}</p>
-                <div className="mt-2 flex gap-3 text-sm">
+                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm">
                   <a href={`https://github.com/${m.github}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand-600 hover:underline">
                     <Github className="h-4 w-4" /> {m.github}
+                  </a>
+                  <a href={m.facebook} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand-600 hover:underline">
+                    <Facebook className="h-4 w-4" /> Facebook
                   </a>
                   {m.site && (
                     <a href={m.site} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand-600 hover:underline">
