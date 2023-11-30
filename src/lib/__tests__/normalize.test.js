@@ -49,3 +49,24 @@ describe('timeAgo', () => {
     expect(timeAgo(new Date(now - 3 * 3600 * 1000), now)).toMatch(/3 giờ/);
   });
 });
+
+import { buildNavigation, chapterLabel, firstReadable } from '../chapters';
+
+describe('chapters', () => {
+  const ch = (id, chapter, groups = ['A'], extra = {}) => ({ id, chapter, groups, ...extra });
+  const list = [ch('3a', '3', ['A']), ch('3b', '3', ['B']), ch('2', '2', ['B']), ch('1', '1', ['A']), ch('x', '4', ['A'], { externalUrl: 'https://x' })];
+
+  it('builds prev/next preferring the same group and skipping external chapters', () => {
+    const nav = buildNavigation(list, list[3]);
+    expect(nav.list.map((c) => c.id)).toEqual(['1', '2', '3a']);
+    expect(nav.prev).toBe(null);
+    expect(nav.next.id).toBe('2');
+    expect(buildNavigation(list, list[0]).next).toBe(null);
+  });
+
+  it('finds the first readable chapter and formats labels', () => {
+    expect(firstReadable(list).id).toBe('1');
+    expect(chapterLabel({ volume: '2', chapter: '10' })).toBe('Tập 2 · Chương 10');
+    expect(chapterLabel({ chapter: null })).toBe('Oneshot');
+  });
+});

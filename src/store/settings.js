@@ -6,7 +6,7 @@ export const settingsStore = createPersistedStore('emanga:settings', {
   translatedLanguage: ['vi', 'en'],
   readerMode: 'vertical', // 'vertical' | 'single'
   readerFit: 'width', // 'width' | 'height' | 'original'
-  dataSaver: false,
+  dataSaver: true, // data-saver images are lighter and stay under the Lambda response limit
 });
 
 export const useSettings = settingsStore.useStore;

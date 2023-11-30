@@ -9,6 +9,7 @@ const Browse = lazy(() => import('./pages/Browse'));
 const MangaDetail = lazy(() => import('./pages/MangaDetail'));
 const Library = lazy(() => import('./pages/Library'));
 const About = lazy(() => import('./pages/About'));
+const Reader = lazy(() => import('./pages/Reader'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Suspense fallback={<PageLoader />}>
         <Routes>
+          <Route path="manga/:id/chapter/:chapterId" element={<Reader />} />
           <Route element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="browse" element={<Browse />} />

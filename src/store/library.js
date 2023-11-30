@@ -66,6 +66,24 @@ export function saveEntry(manga, patch) {
   });
 }
 
+/**
+ * Called by the reader: remembers the last chapter/page and bumps progress to the
+ * chapter number. Opening a chapter adds the manga to the library as "Đang đọc".
+ */
+export function recordRead(manga, chapter, page = 0) {
+  if (!manga?.id || !chapter?.id) return;
+  const entry = libraryStore.getState().entries[manga.id];
+  const last = entry?.lastRead;
+  if (last && last.chapterId === chapter.id && last.page === page) return;
+  const num = Math.floor(parseFloat(chapter.chapter));
+  const patch = {
+    lastRead: { chapterId: chapter.id, chapter: chapter.chapter, language: chapter.language, page, at: Date.now() },
+  };
+  if (!Number.isNaN(num) && num > (entry?.progress ?? 0)) patch.progress = num;
+  if (!entry || entry.status === 'PLANNING') patch.status = 'READING';
+  saveEntry(manga, patch);
+}
+
 export function removeEntry(id) {
   libraryStore.setState((s) => {
     const entries = { ...s.entries };

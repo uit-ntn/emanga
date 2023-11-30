@@ -35,13 +35,24 @@ describe('handle', () => {
       ok({
         data: [
           { id: 'wrong', attributes: { links: { al: '1' } } },
-          { id: 'right', attributes: { links: { al: '30013' }, availableTranslatedLanguages: ['vi', 'en'] } },
+          { id: 'right', attributes: { links: { al: '30013' }, availableTranslatedLanguages: ['vi', 'en', 'fr'] } },
+        ],
+      })
+    );
+    // languages come from real chapters (fr was removed), sorted by chapter count
+    fetch.mockResolvedValueOnce(
+      ok({
+        data: [
+          { attributes: { translatedLanguage: 'en' } },
+          { attributes: { translatedLanguage: 'vi' } },
+          { attributes: { translatedLanguage: 'en' } },
         ],
       })
     );
     const res = await handle('/lookup', { anilistId: '30013', title: 'One Piece' });
     expect(res.status).toBe(200);
-    expect(JSON.parse(res.body)).toEqual({ id: 'right', languages: ['vi', 'en'] });
+    expect(JSON.parse(res.body)).toEqual({ id: 'right', languages: ['en', 'vi'] });
+    expect(fetch.mock.calls[1][0]).toContain('/manga/right/feed');
     expect(fetch.mock.calls[0][1].headers['User-Agent']).toBe(USER_AGENT);
   });
 

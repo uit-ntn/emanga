@@ -113,22 +113,43 @@ function chapterDto(item) {
 
 /* -------------------------------------------------------------- routes */
 
+/**
+ * Languages that actually have readable (non-external) chapters, most chapters first.
+ * `availableTranslatedLanguages` on the manga is not reliable: it keeps languages whose
+ * chapters were removed (e.g. licensed titles).
+ */
+const PRIORITY_LANGS = ['vi', 'en'];
+
+async function readableLanguages(mangadexId, declared = []) {
+  const base = { contentRating: ALL_RATINGS, includeExternalUrl: 0, includeEmptyPages: 0, includeFutureUpdates: 0 };
+  // a sample of recent chapters gives the languages and a rough size for each
+  const res = await mdx(`/manga/${mangadexId}/feed`, { ...base, limit: 500, order: { readableAt: 'desc' } });
+  const counts = {};
+  res.data.forEach((c) => {
+    const l = c.attributes.translatedLanguage;
+    if (l) counts[l] = (counts[l] || 0) + 1;
+  });
+  // the sample can miss languages on long series: check the important ones exactly
+  for (const l of PRIORITY_LANGS) {
+    if (!counts[l] && declared.includes(l)) {
+      const one = await mdx(`/manga/${mangadexId}/feed`, { ...base, limit: 1, translatedLanguage: [l] });
+      if (one.total > 0) counts[l] = one.total;
+    }
+  }
+  return Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+}
+
 /** Find the MangaDex entry for an AniList id (MangaDex stores it in links.al). */
 async function lookup({ anilistId, title, alt }) {
   if (!/^\d+$/.test(anilistId || '')) throw new HttpError(400, 'anilistId không hợp lệ');
   if (!title) throw new HttpError(400, 'Thiếu title');
   const titles = [title, ...(alt ? String(alt).split('|') : [])].filter(Boolean).slice(0, 3);
 
-  return cached(`lookup:${anilistId}`, 24 * 3600e3, async () => {
+  return cached(`lookup:${anilistId}`, 6 * 3600e3, async () => {
     for (const t of titles) {
       const res = await mdx('/manga', { title: t.slice(0, 100), limit: 20, contentRating: ALL_RATINGS, order: { relevance: 'desc' } });
       const match = res.data.find((m) => String(m.attributes.links?.al) === String(anilistId));
-      if (match) {
-        return {
-          id: match.id,
-          languages: match.attributes.availableTranslatedLanguages?.filter(Boolean) ?? [],
-        };
-      }
+      if (match) return { id: match.id, languages: await readableLanguages(match.id, match.attributes.availableTranslatedLanguages ?? []) };
     }
     return { id: null, languages: [] };
   });

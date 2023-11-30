@@ -6,11 +6,12 @@ import { MangaRow } from '../components/manga/MangaGrid';
 import Cover from '../components/ui/Cover';
 import RichText from '../components/ui/RichText';
 import { ErrorState, Skeleton } from '../components/ui/States';
-import { useManga } from '../hooks/queries';
+import { useManga, useReaderSource } from '../hooks/queries';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { COUNTRIES, FORMATS, RELATION_LABELS, ROLE_LABELS, SOURCE_LABELS, STATUS, genreLabel } from '../lib/constants';
 import { formatNumber } from '../lib/format';
 import { ProgressCard, TrackButton } from '../components/manga/TrackerPanel';
+import ReadSection from '../components/manga/ReadSection';
 
 function DetailSkeleton() {
   return (
@@ -84,6 +85,8 @@ function ScoreChart({ data }) {
 export default function MangaDetail() {
   const { id } = useParams();
   const { data: manga, isLoading, error, refetch } = useManga(id);
+  const source = useReaderSource(manga);
+  const canRead = Boolean(source.data?.id && source.data.languages.length);
   const [expanded, setExpanded] = useState(false);
   const [showSpoilers, setShowSpoilers] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -171,8 +174,17 @@ export default function MangaDetail() {
             </div>
 
             <div className="mt-6 flex flex-wrap justify-center gap-2 sm:justify-start">
+              {canRead && (
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => document.getElementById('doc-truyen')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  <BookOpen className="h-4 w-4" /> Đọc truyện
+                </button>
+              )}
               {readLinks[0] && (
-                <a href={readLinks[0].url} target="_blank" rel="noreferrer" className="btn-primary">
+                <a href={readLinks[0].url} target="_blank" rel="noreferrer" className={canRead ? 'btn-secondary' : 'btn-primary'}>
                   <BookOpen className="h-4 w-4" /> Đọc trên {readLinks[0].site}
                 </a>
               )}
@@ -201,9 +213,11 @@ export default function MangaDetail() {
               </section>
             )}
 
+            <ReadSection manga={manga} />
+
             {readLinks.length > 0 && (
               <section>
-                <h2 className="section-title mb-1">Đọc ở đâu?</h2>
+                <h2 className="section-title mb-1">Bản chính thức</h2>
                 <p className="mb-4 text-sm text-zinc-500">Ủng hộ tác giả bằng cách đọc trên các nền tảng chính thức.</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {readLinks.map((l) => (

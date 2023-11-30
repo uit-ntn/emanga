@@ -1,5 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import * as api from '../api/anilist';
+import * as reader from '../api/reader';
 
 export const queryKeys = {
   search: (params) => ['manga', 'search', params],
@@ -30,5 +31,36 @@ export function useGenresAndTags() {
     queryFn: ({ signal }) => api.getGenresAndTags(signal),
     staleTime: Infinity,
     gcTime: Infinity,
+  });
+}
+
+/* ----------------------------------------------------------- reader */
+
+export function useReaderSource(manga) {
+  return useQuery({
+    queryKey: ['reader', 'lookup', manga?.id],
+    queryFn: ({ signal }) => reader.lookupSource(manga, signal),
+    enabled: Boolean(manga?.id),
+    staleTime: 60 * 60 * 1000,
+    retry: false,
+  });
+}
+
+export function useReaderFeed(sourceId, lang) {
+  return useQuery({
+    queryKey: ['reader', 'feed', sourceId, lang],
+    queryFn: ({ signal }) => reader.getFeed(sourceId, lang, signal),
+    enabled: Boolean(sourceId && lang),
+  });
+}
+
+export function useReaderChapter(chapterId, dataSaver) {
+  return useQuery({
+    queryKey: ['reader', 'chapter', chapterId, dataSaver],
+    queryFn: ({ signal }) => reader.getChapter(chapterId, { dataSaver }, signal),
+    enabled: Boolean(chapterId),
+    // image URLs from MangaDex@Home expire after ~15 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
