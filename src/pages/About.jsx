@@ -7,7 +7,7 @@ const FEATURES = [
   { icon: Compass, title: 'Khám phá', text: 'Bảng xếp hạng thịnh hành, phổ biến, điểm cao và truyện sắp ra mắt.' },
   { icon: Search, title: 'Tìm kiếm nâng cao', text: 'Lọc theo thể loại, tag, quốc gia, định dạng, năm phát hành. Hỗ trợ loại trừ.' },
   { icon: LibraryBig, title: 'Tủ truyện cá nhân', text: 'Theo dõi tiến độ, chấm điểm, sao lưu và khôi phục. Không cần tài khoản.' },
-  { icon: Globe, title: 'Đọc chính thức', text: 'Dẫn tới các nền tảng có bản quyền để bạn ủng hộ tác giả.' },
+  { icon: Globe, title: 'Đọc ngay trên web', text: 'Trình đọc cuộn dọc / từng trang, nhớ trang đang đọc. Kèm link bản chính thức để ủng hộ tác giả.' },
   { icon: Moon, title: 'Giao diện sáng / tối', text: 'Tự động theo hệ thống hoặc chọn thủ công.' },
   { icon: Smartphone, title: 'Mọi thiết bị', text: 'Thiết kế responsive, dùng tốt trên điện thoại, máy tính bảng và desktop.' },
 ];
@@ -56,8 +56,11 @@ export default function About() {
             <a href="https://anilist.co" target="_blank" rel="noreferrer" className="font-medium text-brand-600 hover:underline">
               AniList
             </a>{' '}
-            qua API GraphQL công khai. eManga không lưu trữ hay phát tán nội dung truyện. Để đọc, hãy dùng các nền tảng chính thức
-            được liệt kê ở mỗi trang truyện.
+            qua API GraphQL công khai. Chương truyện là bản dịch cộng đồng lấy qua{' '}
+            <a href="https://mangadex.org" target="_blank" rel="noreferrer" className="font-medium text-brand-600 hover:underline">
+              MangaDex
+            </a>
+            , ghi rõ tên nhóm dịch. eManga không lưu trữ nội dung truyện. Khi truyện có bản chính thức, hãy ủng hộ tác giả.
           </p>
         </div>
         <div className="card p-6">
