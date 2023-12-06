@@ -2,20 +2,15 @@ import { Link } from 'react-router-dom';
 import { Facebook, Github, GraduationCap } from 'lucide-react';
 import { Logo } from './Header';
 import { SCHOOL, TEAM } from '../../lib/team';
+import { PITCH } from '../../lib/brand';
 
 export default function Footer() {
   return (
     <footer className="mt-16 border-t border-zinc-200 dark:border-zinc-800">
       <div className="container-page grid gap-8 py-10 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="space-y-3 lg:col-span-2">
-          <Logo />
-          <p className="max-w-md text-sm text-zinc-500 dark:text-zinc-400">
-            Khám phá manga, manhwa, manhua miễn phí, không quảng cáo, không cần tài khoản. Dữ liệu được cung cấp bởi{' '}
-            <a href="https://anilist.co" target="_blank" rel="noreferrer" className="font-medium text-brand-600 hover:underline">
-              AniList
-            </a>
-            .
-          </p>
+        <div className="space-y-4 lg:col-span-2">
+          <Logo tagline="always" />
+          <p className="max-w-md text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{PITCH}</p>
           <a
             href="https://github.com/uit-ntn/emanga-fe"
             target="_blank"
@@ -45,9 +40,19 @@ export default function Footer() {
           <h3 className="mb-3 text-sm font-semibold">Nhóm phát triển</h3>
           <ul className="space-y-3 text-sm">
             {TEAM.map((m) => (
-              <li key={m.github} className="flex items-center justify-between gap-3">
-                <span className="font-medium">{m.name}</span>
-                <span className="flex items-center gap-1">
+              <li key={m.github} className="flex items-start justify-between gap-3">
+                <span className="min-w-0">
+                  <span className="block font-medium">
+                    {m.name}
+                    <span className="ml-2 rounded-md bg-brand-600/10 px-1.5 py-0.5 text-[11px] font-semibold text-brand-700 dark:text-brand-400">
+                      {m.role}
+                    </span>
+                  </span>
+                  <span className="mt-0.5 block text-xs text-zinc-500 dark:text-zinc-400">
+                    {m.major} · {m.program}
+                  </span>
+                </span>
+                <span className="flex shrink-0 items-center gap-1">
                   <a
                     href={m.facebook}
                     target="_blank"
@@ -79,7 +84,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-zinc-200 py-5 text-center text-xs text-zinc-500 dark:border-zinc-800">
-        © {new Date().getFullYear()} eManga · Nguyễn Thanh Nhân &amp; Quãng Đại Thi. Dự án phi lợi nhuận, không liên kết với AniList.
+        © {new Date().getFullYear()} eManga · Nguyễn Thanh Nhân &amp; Quãng Đại Thi. Dự án phi lợi nhuận.
       </div>
     </footer>
   );

@@ -7,29 +7,31 @@ export const SCHOOL = 'Đại học Quốc gia Thành phố Hồ Chí Minh';
 export const TEAM = [
   {
     name: 'Nguyễn Thanh Nhân',
-    role: 'Đồng sáng lập · Lập trình viên',
+    role: 'DevOps Engineer',
+    major: 'Hệ thống thông tin',
+    program: 'Chương trình Chất lượng cao',
     github: 'uit-ntn',
     facebook: 'https://www.facebook.com/UIT.NTN.13',
     site: 'https://uit-ntn.github.io/portfolio/',
-    school: SCHOOL, // TODO: trường thành viên
-    major: 'Ngành: (cập nhật)', // TODO
+    school: SCHOOL,
     studentId: 'MSSV: (cập nhật)', // TODO
     email: 'email@example.com', // TODO
-    bio: 'Phụ trách kiến trúc, frontend React và backend AWS. (Đoạn giới thiệu tạm, sẽ cập nhật.)', // TODO
-    skills: ['React', 'Vite', 'Tailwind CSS', 'AWS Amplify'],
-    contributions: ['Khởi tạo dự án', 'Trang chủ & Khám phá', 'Tủ truyện', 'Backend & trình đọc'],
+    bio: 'Phụ trách hạ tầng, CI/CD và triển khai trên AWS, đồng thời phát triển frontend React và backend. (Đoạn giới thiệu tạm, sẽ cập nhật.)', // TODO
+    skills: ['AWS', 'CI/CD', 'Docker', 'Linux', 'React'],
+    contributions: ['Khởi tạo dự án', 'Hạ tầng & deploy Amplify', 'Backend & trình đọc', 'Tủ truyện'],
   },
   {
     name: 'Quãng Đại Thi',
-    role: 'Đồng sáng lập · Thiết kế',
+    role: 'Business Analyst',
+    major: 'Hệ thống thông tin',
+    program: 'Chương trình Chuẩn',
     github: 'DT2K3',
     facebook: 'https://www.facebook.com/aithi.992969',
-    school: SCHOOL, // TODO: trường thành viên
-    major: 'Ngành: (cập nhật)', // TODO
+    school: SCHOOL,
     studentId: 'MSSV: (cập nhật)', // TODO
     email: 'email@example.com', // TODO
-    bio: 'Phụ trách thiết kế giao diện, danh sách và chi tiết truyện. (Đoạn giới thiệu tạm, sẽ cập nhật.)', // TODO
-    skills: ['UI/UX', 'Figma', 'React'],
-    contributions: ['Danh sách truyện', 'Trang chi tiết truyện', 'Thiết kế giao diện'],
+    bio: 'Phụ trách phân tích yêu cầu, thiết kế luồng người dùng và giao diện danh sách, chi tiết truyện. (Đoạn giới thiệu tạm, sẽ cập nhật.)', // TODO
+    skills: ['Phân tích nghiệp vụ', 'UML / BPMN', 'Figma', 'React'],
+    contributions: ['Phân tích yêu cầu', 'Danh sách truyện', 'Trang chi tiết truyện', 'Thiết kế giao diện'],
   },
 ];

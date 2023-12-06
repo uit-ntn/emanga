@@ -149,7 +149,7 @@ export default function About() {
                   <span>
                     {m.school}
                     <span className="block text-xs text-zinc-500">
-                      {m.major} · {m.studentId}
+                      Ngành {m.major} · {m.program} · {m.studentId}
                     </span>
                   </span>
                 </li>

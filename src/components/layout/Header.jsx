@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 import clsx from 'clsx';
 import ThemeToggle from './ThemeToggle';
 import SearchBox from './SearchBox';
+import { SLOGAN } from '../../lib/brand';
 
 const NAV = [
   { to: '/', label: 'Trang chủ', end: true },
@@ -12,12 +13,29 @@ const NAV = [
   { to: '/about', label: 'Giới thiệu' },
 ];
 
-export function Logo() {
+/**
+ * Brand mark. `tagline`: 'always' | 'wide' (only on xl screens, used in the header) | undefined.
+ */
+export function Logo({ tagline }) {
   return (
-    <Link to="/" className="flex shrink-0 items-center gap-2 font-extrabold tracking-tight">
-      <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white">e</span>
-      <span className="text-lg">
-        e<span className="text-brand-600">Manga</span>
+    <Link to="/" className="group flex shrink-0 items-center gap-2.5" aria-label={`eManga – ${SLOGAN}`}>
+      <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-lg font-black text-white shadow-sm shadow-brand-600/30 transition group-hover:rotate-[-6deg]">
+        e
+      </span>
+      <span className="flex flex-col leading-none">
+        <span className="text-lg font-extrabold tracking-tight">
+          e<span className="text-brand-600">Manga</span>
+        </span>
+        {tagline && (
+          <span
+            className={clsx(
+              'mt-1 text-[11px] font-medium text-zinc-500 dark:text-zinc-400',
+              tagline === 'wide' && 'hidden xl:block'
+            )}
+          >
+            {SLOGAN}
+          </span>
+        )}
       </span>
     </Link>
   );
@@ -54,7 +72,7 @@ export default function Header() {
       )}
     >
       <div className="container-page flex h-16 items-center gap-4">
-        <Logo />
+        <Logo tagline="wide" />
         <nav className="hidden items-center gap-1 md:flex" aria-label="Chính">
           {NAV.map((n) => (
             <NavLink key={n.to} to={n.to} end={n.end} className={linkCls}>
