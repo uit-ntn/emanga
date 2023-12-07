@@ -1,17 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Compass, Database, Facebook, Github, GraduationCap, Globe, LibraryBig, Mail, Moon, Search, ShieldCheck, Smartphone } from 'lucide-react';
+import { Facebook, Github, GraduationCap, Globe, Mail } from 'lucide-react';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { SCHOOL, TEAM } from '../lib/team';
 import { PHASES, STATS } from '../lib/timeline';
-
-const FEATURES = [
-  { icon: Compass, title: 'Khám phá', text: 'Bảng xếp hạng thịnh hành, phổ biến, điểm cao và truyện sắp ra mắt.' },
-  { icon: Search, title: 'Tìm kiếm nâng cao', text: 'Lọc theo thể loại, tag, quốc gia, định dạng, năm phát hành. Hỗ trợ loại trừ.' },
-  { icon: LibraryBig, title: 'Tủ truyện cá nhân', text: 'Theo dõi tiến độ, chấm điểm, sao lưu và khôi phục. Không cần tài khoản.' },
-  { icon: Globe, title: 'Đọc ngay trên web', text: 'Trình đọc cuộn dọc / từng trang, nhớ trang đang đọc. Kèm link bản chính thức để ủng hộ tác giả.' },
-  { icon: Moon, title: 'Giao diện sáng / tối', text: 'Tự động theo hệ thống hoặc chọn thủ công.' },
-  { icon: Smartphone, title: 'Mọi thiết bị', text: 'Thiết kế responsive, dùng tốt trên điện thoại, máy tính bảng và desktop.' },
-];
 
 export default function About() {
   useDocumentTitle('Giới thiệu');
@@ -31,48 +22,6 @@ export default function About() {
           <a href="https://github.com/uit-ntn/emanga-fe" target="_blank" rel="noreferrer" className="btn-secondary">
             <Github className="h-4 w-4" /> Mã nguồn
           </a>
-        </div>
-      </section>
-
-      <section className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map(({ icon: Icon, title, text }) => (
-          <div key={title} className="card p-6">
-            <div className="grid h-11 w-11 place-items-center rounded-xl bg-brand-600/10 text-brand-600">
-              <Icon className="h-5 w-5" />
-            </div>
-            <h2 className="mt-4 font-bold">{title}</h2>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{text}</p>
-          </div>
-        ))}
-      </section>
-
-      <section className="mt-16 grid gap-6 lg:grid-cols-2">
-        <div className="card p-6">
-          <div className="flex items-center gap-2">
-            <Database className="h-5 w-5 text-brand-600" />
-            <h2 className="text-lg font-bold">Nguồn dữ liệu</h2>
-          </div>
-          <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Thông tin truyện, ảnh bìa, nhân vật và đánh giá được lấy trực tiếp từ{' '}
-            <a href="https://anilist.co" target="_blank" rel="noreferrer" className="font-medium text-brand-600 hover:underline">
-              AniList
-            </a>{' '}
-            qua API GraphQL công khai. Chương truyện là bản dịch cộng đồng lấy qua{' '}
-            <a href="https://mangadex.org" target="_blank" rel="noreferrer" className="font-medium text-brand-600 hover:underline">
-              MangaDex
-            </a>
-            , ghi rõ tên nhóm dịch. eManga không lưu trữ nội dung truyện. Khi truyện có bản chính thức, hãy ủng hộ tác giả.
-          </p>
-        </div>
-        <div className="card p-6">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-brand-600" />
-            <h2 className="text-lg font-bold">Quyền riêng tư</h2>
-          </div>
-          <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Không đăng ký, không đăng nhập, không theo dõi. Tủ truyện và cài đặt chỉ được lưu trong trình duyệt của bạn
-            (localStorage). Bạn có thể sao lưu ra file JSON bất cứ lúc nào.
-          </p>
         </div>
       </section>
 
@@ -153,12 +102,14 @@ export default function About() {
                     </span>
                   </span>
                 </li>
-                <li className="flex gap-2">
-                  <Mail className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
-                  <a href={`mailto:${m.email}`} className="hover:text-brand-600">
-                    {m.email}
-                  </a>
-                </li>
+                {m.email && (
+                  <li className="flex gap-2">
+                    <Mail className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
+                    <a href={`mailto:${m.email}`} className="hover:text-brand-600">
+                      {m.email}
+                    </a>
+                  </li>
+                )}
               </ul>
 
               <div className="mt-4">
