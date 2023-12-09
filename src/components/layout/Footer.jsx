@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Github, GraduationCap } from 'lucide-react';
+import { Github, GraduationCap } from 'lucide-react';
 import { Logo } from './Header';
-import { SCHOOL, TEAM } from '../../lib/team';
+import { SCHOOL, TEAM, socialLinks } from '../../lib/team';
+import SocialIcon from '../ui/SocialIcon';
 import { PITCH } from '../../lib/brand';
 
 export default function Footer() {
@@ -52,27 +53,20 @@ export default function Footer() {
                     {m.major} · {m.program}
                   </span>
                 </span>
-                <span className="flex shrink-0 items-center gap-1">
-                  <a
-                    href={m.facebook}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-zinc-100 hover:text-[#1877f2] dark:hover:bg-zinc-800"
-                    aria-label={`Facebook của ${m.name}`}
-                    title="Facebook"
-                  >
-                    <Facebook className="h-4 w-4" />
-                  </a>
-                  <a
-                    href={`https://github.com/${m.github}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-white"
-                    aria-label={`GitHub của ${m.name}`}
-                    title="GitHub"
-                  >
-                    <Github className="h-4 w-4" />
-                  </a>
+                <span className="flex shrink-0 items-center gap-0.5">
+                  {socialLinks(m).map((l) => (
+                    <a
+                      key={l.key}
+                      href={l.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-zinc-100 hover:text-brand-600 dark:hover:bg-zinc-800"
+                      aria-label={`${l.label} của ${m.name}`}
+                      title={l.label}
+                    >
+                      <SocialIcon name={l.key} />
+                    </a>
+                  ))}
                 </span>
               </li>
             ))}
@@ -84,7 +78,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-zinc-200 py-5 text-center text-xs text-zinc-500 dark:border-zinc-800">
-        © {new Date().getFullYear()} eManga · Nguyễn Thanh Nhân &amp; Quãng Đại Thi. Dự án phi lợi nhuận.
+        © 2023 eManga · Nguyễn Thanh Nhân &amp; Quãng Đại Thi. Dự án phi lợi nhuận.
       </div>
     </footer>
   );

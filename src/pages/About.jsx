@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Github, GraduationCap, Globe, Mail } from 'lucide-react';
+import { Github, GraduationCap, Globe, Mail } from 'lucide-react';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import { SCHOOL, TEAM } from '../lib/team';
+import { SCHOOL, TEAM, socialLinks } from '../lib/team';
+import SocialIcon from '../components/ui/SocialIcon';
 import { PHASES, STATS } from '../lib/timeline';
 
 export default function About() {
@@ -134,12 +135,11 @@ export default function About() {
               </div>
 
               <div className="mt-auto flex flex-wrap gap-2 pt-5">
-                <a href={m.facebook} target="_blank" rel="noreferrer" className="btn-secondary px-3 py-1.5">
-                  <Facebook className="h-4 w-4" /> Facebook
-                </a>
-                <a href={`https://github.com/${m.github}`} target="_blank" rel="noreferrer" className="btn-secondary px-3 py-1.5">
-                  <Github className="h-4 w-4" /> {m.github}
-                </a>
+                {socialLinks(m).map((l) => (
+                  <a key={l.key} href={l.url} target="_blank" rel="noreferrer" className="btn-secondary px-3 py-1.5">
+                    <SocialIcon name={l.key} /> {l.key === 'github' ? m.github : l.label}
+                  </a>
+                ))}
                 {m.site && (
                   <a href={m.site} target="_blank" rel="noreferrer" className="btn-secondary px-3 py-1.5">
                     <Globe className="h-4 w-4" /> Portfolio

@@ -29,7 +29,7 @@ export const PHASES = [
     ],
   },
   {
-    period: '18/11 – 26/11/2023',
+    period: '18/11 – 24/11/2023',
     title: 'Đổi nguồn dữ liệu, thêm tủ truyện',
     summary:
       'MangaDex chặn request từ trình duyệt trên website khác, nên phần thông tin truyện chuyển sang AniList GraphQL (công khai, hỗ trợ CORS).',
@@ -37,7 +37,6 @@ export const PHASES = [
       { date: '18/11', text: 'Chuyển sang AniList: xếp hạng, nhân vật, truyện liên quan, gợi ý, biểu đồ điểm' },
       { date: '21/11', text: 'Tủ truyện cá nhân lưu trên trình duyệt: trạng thái, tiến độ, điểm, sao lưu JSON' },
       { date: '24/11', text: 'Trang Giới thiệu, README mới' },
-      { date: '26/11', text: 'Ghi tên nhóm phát triển ở footer' },
     ],
   },
   {
