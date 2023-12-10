@@ -32,8 +32,8 @@ export const TEAM = [
     linkedin: 'https://www.linkedin.com/in/thi-qu%C3%A3ng-%C4%91%E1%BA%A1i-90736a268/',
     instagram: '', // TODO: link Instagram
     school: SCHOOL,
-    studentId: 'MSSV:', // TODO
-    email: '2152@gm.uit.edu.vn', // TODO
+    studentId: 'MSSV: 21522616', // TODO
+    email: '21522616@gm.uit.edu.vn', // TODO
     bio: 'Phụ trách phân tích yêu cầu, thiết kế luồng người dùng và giao diện danh sách, chi tiết truyện.', // TODO
     skills: ['Phân tích nghiệp vụ', 'UML / BPMN', 'Figma', 'React'],
     contributions: ['Phân tích yêu cầu', 'Danh sách truyện', 'Trang chi tiết truyện', 'Thiết kế giao diện'],
