@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import ThemeToggle from './ThemeToggle';
 import SearchBox from './SearchBox';
 import { SLOGAN } from '../../lib/brand';
+import logoMark from '../../assets/img/logo-mark.webp';
 
 const NAV = [
   { to: '/', label: 'Trang chủ', end: true },
@@ -19,9 +20,13 @@ const NAV = [
 export function Logo({ tagline }) {
   return (
     <Link to="/" className="group flex shrink-0 items-center gap-2.5" aria-label={`eManga – ${SLOGAN}`}>
-      <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-lg font-black text-white shadow-sm shadow-brand-600/30 transition group-hover:rotate-[-6deg]">
-        e
-      </span>
+      <img
+        src={logoMark}
+        alt=""
+        width={40}
+        height={40}
+        className="h-10 w-10 rounded-xl shadow-sm shadow-brand-600/30 ring-1 ring-black/5 transition group-hover:scale-105 group-hover:rotate-[-4deg] dark:ring-white/10"
+      />
       <span className="flex flex-col leading-none">
         <span className="text-lg font-extrabold tracking-tight">
           e<span className="text-brand-600">Manga</span>
