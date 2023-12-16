@@ -4,6 +4,27 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { SCHOOL, TEAM, socialLinks } from '../lib/team';
 import SocialIcon from '../components/ui/SocialIcon';
 import { PHASES, STATS } from '../lib/timeline';
+import banner from '../assets/img/Banner.png';
+import { FOUNDED } from '../lib/brand';
+
+const BRAND_STORY = [
+  {
+    title: 'Cuốn sách đang mở',
+    text: 'Biểu tượng của eManga là một cuốn truyện vừa được lật ra. Không phải cuốn sách đóng gáy nằm im trên kệ, mà là khoảnh khắc ngay trước khi bạn chìm vào trang đầu tiên. Đó là cảm giác bọn mình muốn mỗi lần bạn mở web.',
+  },
+  {
+    title: 'Ngôi sao lấp lánh',
+    text: 'Vệt sáng bay ra từ trang sách là chút phép màu của truyện tranh: một chương mới, một plot twist, một nhân vật khiến bạn thức tới 2 giờ sáng. Bọn mình gọi nó là "ngôi sao của chương tiếp theo".',
+  },
+  {
+    title: 'A New World in Every Page',
+    text: 'Mỗi trang, một thế giới. Manga, manhwa hay manhua, mỗi bộ truyện là một vũ trụ riêng, và eManga chỉ muốn làm cánh cửa gọn gàng, nhanh và miễn phí để bạn bước vào.',
+  },
+  {
+    title: `Since ${FOUNDED}`,
+    text: `eManga ra đời vào tháng 9/${FOUNDED}, bắt đầu từ một đồ án sinh viên và vài dòng commit đầu tiên. Từ đó tới cuối năm, giao diện được làm lại từ đầu, đổi nguồn dữ liệu, thêm tủ truyện, backend và trình đọc. Con số ${FOUNDED} trên logo là lời nhắc rằng bọn mình đã đi một chặng đường, và vẫn đang đi tiếp.`,
+  },
+];
 
 export default function About() {
   useDocumentTitle('Giới thiệu');
@@ -23,6 +44,25 @@ export default function About() {
           <a href="https://github.com/uit-ntn/emanga-fe" target="_blank" rel="noreferrer" className="btn-secondary">
             <Github className="h-4 w-4" /> Mã nguồn
           </a>
+        </div>
+      </section>
+
+
+      <section className="mx-auto mt-20 max-w-5xl">
+        <div className="overflow-hidden rounded-3xl bg-zinc-950 px-6 py-8 ring-1 ring-brand-600/20 sm:px-10">
+          <img src={banner} alt={`eManga – A New World in Every Page – Since ${FOUNDED}`} width={2172} height={724} className="mx-auto w-full max-w-3xl" loading="lazy" />
+        </div>
+        <h2 className="section-title mt-10 text-center">Câu chuyện sau logo</h2>
+        <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-zinc-500">
+          Logo của eManga không chỉ để cho đẹp. Mỗi chi tiết trên đó là một mảnh của câu chuyện bọn mình bắt đầu từ năm {FOUNDED}.
+        </p>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          {BRAND_STORY.map((b) => (
+            <article key={b.title} className="card p-6">
+              <h3 className="text-lg font-bold text-brand-600">{b.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{b.text}</p>
+            </article>
+          ))}
         </div>
       </section>
 

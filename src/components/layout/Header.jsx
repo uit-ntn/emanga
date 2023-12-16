@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import ThemeToggle from './ThemeToggle';
 import SearchBox from './SearchBox';
 import { SLOGAN } from '../../lib/brand';
-import logoMark from '../../assets/img/logo-mark.webp';
+import logo from '../../assets/img/Banner.png';
 
 const NAV = [
   { to: '/', label: 'Trang chủ', end: true },
@@ -14,34 +14,17 @@ const NAV = [
   { to: '/about', label: 'Giới thiệu' },
 ];
 
-/**
- * Brand mark. `tagline`: 'always' | 'wide' (only on xl screens, used in the header) | undefined.
- */
-export function Logo({ tagline }) {
+/** Brand mark: the eManga banner (open book, wordmark, slogan, "Since 2023"). */
+export function Logo({ className }) {
   return (
-    <Link to="/" className="group flex shrink-0 items-center gap-2.5" aria-label={`eManga – ${SLOGAN}`}>
+    <Link to="/" className="group flex shrink-0 items-center" aria-label={`eManga – ${SLOGAN}`}>
       <img
-        src={logoMark}
-        alt=""
-        width={40}
-        height={40}
-        className="h-10 w-10 rounded-xl shadow-sm shadow-brand-600/30 ring-1 ring-black/5 transition group-hover:scale-105 group-hover:rotate-[-4deg] dark:ring-white/10"
+        src={logo}
+        alt="eManga"
+        width={2172}
+        height={724}
+        className={clsx('w-auto transition group-hover:opacity-90', className ?? 'h-20')}
       />
-      <span className="flex flex-col leading-none">
-        <span className="text-lg font-extrabold tracking-tight">
-          e<span className="text-brand-600">Manga</span>
-        </span>
-        {tagline && (
-          <span
-            className={clsx(
-              'mt-1 text-[11px] font-medium text-zinc-500 dark:text-zinc-400',
-              tagline === 'wide' && 'hidden xl:block'
-            )}
-          >
-            {SLOGAN}
-          </span>
-        )}
-      </span>
     </Link>
   );
 }
@@ -76,8 +59,8 @@ export default function Header() {
           : 'border-transparent bg-white/60 dark:bg-zinc-950/60'
       )}
     >
-      <div className="container-page flex h-16 items-center gap-4">
-        <Logo tagline="wide" />
+      <div className="container-page flex h-20 items-center gap-4">
+        <Logo />
         <nav className="hidden items-center gap-1 md:flex" aria-label="Chính">
           {NAV.map((n) => (
             <NavLink key={n.to} to={n.to} end={n.end} className={linkCls}>

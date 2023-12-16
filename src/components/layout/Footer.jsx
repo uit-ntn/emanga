@@ -3,14 +3,14 @@ import { Github, GraduationCap } from 'lucide-react';
 import { Logo } from './Header';
 import { SCHOOL, TEAM, socialLinks } from '../../lib/team';
 import SocialIcon from '../ui/SocialIcon';
-import { PITCH } from '../../lib/brand';
+import { FOUNDED, PITCH } from '../../lib/brand';
 
 export default function Footer() {
   return (
     <footer className="mt-16 border-t border-zinc-200 dark:border-zinc-800">
       <div className="container-page grid gap-8 py-10 sm:grid-cols-2 lg:grid-cols-5">
         <div className="space-y-4 lg:col-span-2">
-          <Logo tagline="always" />
+          <Logo className="h-28" />
           <p className="max-w-md text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{PITCH}</p>
           <a
             href="https://github.com/uit-ntn/emanga-fe"
@@ -78,7 +78,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-zinc-200 py-5 text-center text-xs text-zinc-500 dark:border-zinc-800">
-        © 2023 eManga · Nguyễn Thanh Nhân &amp; Quãng Đại Thi. Dự án phi lợi nhuận.
+        © {FOUNDED} eManga · Nguyễn Thanh Nhân &amp; Quãng Đại Thi. Dự án phi lợi nhuận.
       </div>
     </footer>
   );
