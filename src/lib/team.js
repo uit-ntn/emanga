@@ -1,4 +1,4 @@
-export const SCHOOL = 'Đại học Quốc gia Thành phố Hồ Chí Minh';
+export const SCHOOL = 'Trường Đại học Công nghệ Thông tin, Đại học Quốc gia Thành phố Hồ Chí Minh';
 
 /**
  * Team info for the footer and About page.
