@@ -1,79 +1,71 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import "../style/Header.css";
-import LogInModal from "./LogInModal";
-import SignUpModal from "./SignUpModal";
 import logo from "../image/goku.png";
 import SearchBar from "./SearchBar";
 
 function Header() {
-  // State variables to control modal visibility
-  const [signUpModalOpen, setSignUpModalOpen] = useState(false);
-  const [logInModalOpen, setLogInModalOpen] = useState(false);
-
-  // Functions to open/close modals
-  const openSignUpModal = () => setSignUpModalOpen(true);
-  const closeSignUpModal = () => setSignUpModalOpen(false);
-  const openLogInModal = () => setLogInModalOpen(true);
-  const closeLogInModal = () => setLogInModalOpen(false);
-
-  // State variable to store logged-in user's name
-  const [loggedInUser, setLoggedInUser] = useState(null);
-
-  const handleLogin = (userData) => {
-    setLoggedInUser(userData.username);
-    closeLogInModal();
-  };
-
   return (
     <div className="Header">
-      <nav>
-        <img className="logo" src={logo} alt="lỗi hình ảnh" />
-        <Link to="/" className="nav-item">
-          HOME
-        </Link>
-        <div className="nav-item sub-nav-trigger">
-          THỂ LOẠI
-          <div className="sub-nav">
-            <ul className="nav-list">
-              <li>Thể loại 1</li>
-              <li>Thể loại 2</li>
-              <li>Thể loại 3</li>
-              <li>Thể loại 4</li>
-              <li>Thể loại 5</li>
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+        <div className="container-fluid px-4">
+          <Link to="/" className="navbar-brand d-flex align-items-center">
+            <img
+              src={logo}
+              alt="eManga Logo"
+              height="40"
+              className="d-inline-block me-2"
+              style={{ filter: "drop-shadow(0px 0px 3px rgba(255,255,255,0.3))" }}
+            />
+            <span className="fw-bold" style={{ background: "linear-gradient(45deg, #ff6b6b, #6b47ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              eManga
+            </span>
+          </Link>
+
+          <button
+            className="navbar-toggler border-0"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarContent"
+            aria-controls="navbarContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+
+          <div className="collapse navbar-collapse" id="navbarContent">
+            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+              <li className="nav-item px-1">
+                <Link to="/" className="nav-link active fw-bold">
+                  <i className="bi bi-house-door me-1"></i> HOME
+                </Link>
+              </li>
+              <li className="nav-item px-1">
+                <Link to="/about" className="nav-link fw-bold">
+                  <i className="bi bi-info-circle me-1"></i> ABOUT
+                </Link>
+              </li>
+              <li className="nav-item px-1">
+                <Link to="/contact" className="nav-link fw-bold">
+                  <i className="bi bi-envelope me-1"></i> CONTACT
+                </Link>
+              </li>
             </ul>
+
+            <div className="d-flex align-items-center gap-3">
+              {/* Enhanced Search Bar with more space */}
+              <div className="nav-search d-none d-lg-block flex-grow-1" style={{ minWidth: "320px", maxWidth: "400px" }}>
+                <SearchBar />
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Search Bar with full width */}
+          <div className="d-lg-none w-100 mt-3 mb-2">
+            <SearchBar />
           </div>
         </div>
-        <Link to="/about" className="nav-item">
-          ABOUT
-        </Link>
-        <Link to="/contact" className="nav-item">
-          CONTACT
-        </Link>
-        <Link to="/" className="nav-item">
-          MANGA LIST
-        </Link>
-        <SearchBar />
-        <div className="login-box">
-          {loggedInUser ? (
-            <div>
-              Welcome, {loggedInUser}! {/* Display the user's name */}
-            </div>
-          ) : (
-            <div>
-              <button className="login-btn" type="button" onClick={openLogInModal}>
-                Login
-              </button>
-              <button className="signup-btn" type="button" onClick={openSignUpModal}>
-                Sign up
-              </button>
-            </div>
-          )}
-        </div>
       </nav>
-      {/* Modals */}
-      <SignUpModal isOpen={signUpModalOpen} onClose={closeSignUpModal} />
-      <LogInModal isOpen={logInModalOpen} onClose={closeLogInModal} />
     </div>
   );
 }
